@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Волейбольная статистика команды SKYLINE: баланс очков, ошибки, рейтинги и точки роста.">
+<meta name="theme-color" content="#0d1117">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230d1117'/%3E%3Ctext x='50' y='72' font-size='64' text-anchor='middle' fill='%235eead4' font-family='system-ui,sans-serif' font-weight='800'%3ES%3C/text%3E%3C/svg%3E">
+<title>SKYLINE — волейбольная статистика</title>
+<script>(function(){try{var t=localStorage.getItem('skyline-theme');if(!t)t=(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='dark';}})();</script>
+<style>
+:root{
+  --bg:#0d1117;--bg2:#111722;--card:#161d29;--line:#202a3a;--line2:#2a3650;
+  --txt:#e6edf7;--muted:#93a3b8;--dim:#64748f;
+  --good:#3ddc84;--warn:#fbbf24;--bad:#f87171;
+  --pass:#38bdf8;--attack:#fb923c;--recv:#34d399;--def:#a78bfa;--pod:#f472b6;--block:#facc15;--serve:#22d3ee;
+  --acc:#5eead4;--acc2:#7dd3fc;
+  --hover:rgba(255,255,255,.03);--neu:rgba(255,255,255,.06);
+}
+[data-theme="light"]{
+  --bg:#f2f4f9;--bg2:#e7ebf2;--card:#ffffff;--line:#d7ddeb;--line2:#c1cbe2;
+  --txt:#17202e;--muted:#45536a;--dim:#75849b;
+  --good:#0e9f53;--warn:#b47a00;--bad:#d13535;
+  --pass:#0d76b8;--attack:#dd6a1d;--recv:#0e9b6e;--def:#7446cf;--pod:#cf3f80;--block:#c7960a;--serve:#0aa0b0;
+  --acc:#0d9488;--acc2:#0284c7;
+  --hover:rgba(10,20,40,.045);--neu:rgba(10,20,40,.07);
+}
+@media(prefers-color-scheme:dark){:root{color-scheme:dark}[data-theme="light"]{color-scheme:light}}
+*{box-sizing:border-box;margin:0;padding:0}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:6px}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 18px 60px}
+header.hero{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;padding:26px 0 16px}
+header.hero h1{font-size:26px;font-weight:800;letter-spacing:.02em;background:linear-gradient(90deg,#e6edf7,#5eead4);-webkit-background-clip:text;background-clip:text;color:transparent}
+header.hero .sub{color:var(--muted);font-size:13px;margin-top:4px}
+header.hero .tags{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.tag{font-size:12px;color:var(--muted);background:var(--bg2);border:1px solid var(--line);border-radius:99px;padding:5px 12px}
+.tag b{color:var(--txt);font-weight:700}
+nav.tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:18px}
+.tab{background:none;color:var(--muted);border:1px solid transparent;font:inherit;font-weight:600;padding:8px 16px;border-radius:10px;cursor:pointer;transition:.15s}
+.tab:hover{color:var(--txt);background:var(--bg2)}
+.tab.active{color:var(--txt);background:var(--bg2);border-color:var(--line2);box-shadow:0 0 0 1px var(--acc) inset}
+.view{display:none}
+.view.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))}
+.cards{grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.card.pad0{padding:0;overflow:hidden}
+.kpi{position:relative;overflow:hidden}
+.kpi .glow{position:absolute;inset:0 0 auto 0;height:3px}
+.k-label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+.k-val{font-size:26px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums}
+.k-sub{color:var(--dim);font-size:12px;margin-top:2px}
+.section-title{display:flex;align-items:center;gap:12px;margin:26px 0 14px}
+.section-title h2{font-size:17px;font-weight:700;white-space:nowrap}
+.section-title .line{flex:1;height:1px;background:var(--line)}
+.section-title .hint{color:var(--dim);font-size:12px}
+.mini{color:var(--muted);font-size:12.5px;font-weight:500}
+.rankbadge{width:26px;height:26px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;background:var(--bg2);color:var(--muted);border:1px solid var(--line2);flex:none}
+.rankbadge.g1{background:#f6e27a20;color:#f6e27a;border-color:#f6e27a66}
+.rankbadge.g2{background:#c8d4e620;color:#c8d4e6;border-color:#c8d4e666}
+.rankbadge.g3{background:#e4936b20;color:#e4936b;border-color:#e4936b55}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th.l,td.l{text-align:left}
+thead th{color:var(--dim);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;cursor:pointer;user-select:none;position:sticky;top:0;background:var(--card);z-index:1}
+thead th.sorted{color:var(--txt)}
+.arr{font-size:10px;margin-left:3px;color:var(--acc)}
+tbody tr:hover{background:var(--hover)}
+.name{font-weight:700}
+.scroll-x{overflow-x:auto}
+.tbl-wrap{overflow:auto;max-height:70vh}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chip{background:var(--bg2);border:1px solid var(--line2);color:var(--muted);font:inherit;font-weight:600;border-radius:99px;padding:7px 14px;cursor:pointer;transition:.15s}
+.chip:hover{color:var(--txt);border-color:var(--acc)}
+.chip.active{color:var(--txt);border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:7px;vertical-align:middle}
+.hero{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.hero .score{color:var(--muted)}
+.mvp{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.mvp .name{font-size:22px;font-weight:800}
+.mvp .meta{color:var(--muted);font-size:12.5px;margin-top:2px}
+.mvp .big{font-size:34px;font-weight:800;color:var(--good);font-variant-numeric:tabular-nums}
+.mvp .big small{display:block;font-size:11px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;text-align:center}
+.setbox{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:8px 12px;text-align:center}
+.setbox .sn{color:var(--dim);font-size:11px}
+.setbox .sp{font-size:18px;font-weight:800}
+.setbox .se{color:var(--muted);font-size:11px}
+.bar-row{display:flex;align-items:center;gap:10px;padding:7px 0}
+.bar-row .bl{width:96px;flex:none;color:var(--txt);font-weight:600}
+.bar-row .bv{width:110px;flex:none;text-align:right;font-variant-numeric:tabular-nums}
+.bar{flex:1;height:9px;background:var(--bg2);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px}
+.bar-row .bpos,.bar-row .bneg{flex:none;width:64px;font-size:11.5px;color:var(--muted)}
+.meter{display:flex;height:20px;border-radius:6px;overflow:hidden;background:var(--bg2);border:1px solid var(--line)}
+.meter i.pos{background:linear-gradient(90deg,#2ecc71aa,#3ddc84)}
+.meter i.neg{background:linear-gradient(90deg,#f87171,#ef4444)}
+.meter i.neu{background:var(--neu)}
+.mini-tag{font-size:10px;color:var(--warn);border:1px solid var(--warn);border-radius:99px;padding:2px 7px;white-space:nowrap;vertical-align:middle;margin-left:8px}
+table.mt th,table.st th{position:static}
+.skill-note{color:var(--dim);font-size:11.5px}
+.empty{color:var(--muted);text-align:center;padding:40px 0}
+.footer{color:var(--dim);font-size:12px;margin-top:40px;padding-top:16px;border-top:1px solid var(--line);line-height:1.7}
+.method h3{font-size:15px;margin:18px 0 8px;color:var(--txt)}
+.method p,.method li{color:var(--muted);font-size:13.5px;line-height:1.65}
+.method ul{padding-left:20px;margin:6px 0}
+.formula{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font:600 12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--acc);overflow-x:auto;white-space:nowrap}
+.legend-item{display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
+.legend-item:last-child{border-bottom:0}
+.legend-item .lg{width:10px;height:10px;border-radius:3px;margin-top:6px;flex:none}
+.legend-item .lt{font-weight:700;font-size:13.5px}
+.legend-item .ld{color:var(--muted);font-size:12.5px}
+.method code{background:var(--bg2);border:1px solid var(--line);padding:1px 6px;border-radius:6px;font:12px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--acc)}
+.meta-line{color:var(--muted);font-size:13px;line-height:1.6;padding:6px 0;border-bottom:1px dashed var(--line)}
+.meta-line:last-child{border-bottom:0}
+.meta-line b{color:var(--txt);font-weight:700}
+.note{background:linear-gradient(180deg,var(--bg2),transparent);border:1px solid var(--line2);border-left:4px solid var(--acc);border-radius:12px;padding:16px 18px;margin-top:14px}
+.note h3{color:var(--acc);margin-top:0}
+.note p,.note li{font-size:13px;color:var(--muted)}
+.note b{color:var(--txt)}
+.method .m2{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))}
+.kv{display:grid;gap:0;margin-top:8px}
+.kv-i{padding:9px 0 9px 12px;border-bottom:1px dashed var(--line);border-left:2px solid var(--line2)}
+.kv-i:last-child{border-bottom:0}
+.kv-k{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--acc);font-weight:700;margin-bottom:3px}
+.kv-v{display:block;color:var(--muted);font-size:13px;line-height:1.6}
+.m-legend{list-style:none;padding:0;margin:12px 0 4px}
+.m-legend li{display:flex;gap:10px;align-items:baseline;padding:5px 0;font-size:13px;color:var(--muted);line-height:1.6}
+.m-legend b{color:var(--txt)}
+.dp{width:10px;height:10px;border-radius:3px;flex:none;transform:translateY(1px)}
+.dp.pos{background:var(--good)}
+.dp.neg{background:var(--bad)}
+.dp.nul{background:var(--dim)}
+.ms{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px;margin-top:12px}
+.ms-i{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:13px 14px}
+.msbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+.msn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;color:var(--txt)}
+.msn .sk-dot{width:9px;height:9px;border-radius:3px;flex:none}
+.msd{color:var(--muted);font-size:12.5px;line-height:1.6;margin:8px 0 10px}
+.ms-i .formula{margin:0}
+.method .m-legend{list-style:none;padding:0;margin:12px 0 4px}
+.method .mini{font-size:12.5px;color:var(--muted)}
+table.mt th,table.st th{cursor:default}
+.export-btn,.theme-btn{background:var(--bg2);border:1px solid var(--line2);color:var(--muted);font:600 11.5px system-ui,sans-serif;border-radius:99px;padding:5px 12px;cursor:pointer;transition:.15s;white-space:nowrap}
+.export-btn:hover,.theme-btn:hover{color:var(--txt);border-color:var(--acc)}
+tr.small-sample{opacity:.55}
+thead th[aria-sort]{cursor:pointer}
+.table-tool{display:flex;gap:10px;margin:18px 0 10px;align-items:center;flex-wrap:wrap}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}.view.active{animation:none}}
+@media print{
+  html,body{background:#fff!important}
+  :root,[data-theme]{--bg:#fff;--bg2:#f2f4f8;--card:#fff;--line:#cbd3e1;--line2:#cbd3e1;--txt:#111;--muted:#333;--dim:#555;
+    --good:#0e9f53;--warn:#b47a00;--bad:#d13535;--pass:#0d76b8;--attack:#dd6a1d;--recv:#0e9b6e;--def:#7446cf;--pod:#cf3f80;--block:#c7960a;--serve:#0aa0b0;--acc:#0d9488;--acc2:#0284c7;--hover:#00000008;--neu:#00000008}
+  .tabs,.chips,.export-btn,.theme-btn,.tag{display:none!important}
+  .view{display:block!important;margin-bottom:28px}
+  .card{break-inside:avoid;box-shadow:none;border:1px solid #ccd3e0}
+  .wrap{max-width:none;padding:0}
+  .tbl-wrap,.scroll-x{max-height:none;overflow:visible}
+  thead th{position:static;background:#f2f4f8!important}
+  .section-title{break-after:avoid}
+  tr.small-sample{opacity:1}
+}
+@media(max-width:640px){.kpis{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}}
+@media(max-width:640px){
+  .wrap{padding:14px 12px 48px}
+  header.hero{padding:20px 0 12px}
+  header.hero h1{font-size:22px}
+  nav.tabs{padding-bottom:10px;margin-bottom:14px}
+  .tab{flex:1 1 30%;text-align:center;padding:9px 8px;font-size:13px}
+  .section-title{flex-wrap:wrap;gap:4px 10px;margin:20px 0 12px}
+  .section-title .hint{flex-basis:100%}
+  th,td{padding:8px 10px}
+  .tbl-wrap{max-height:60vh}
+  .chip{padding:8px 13px}
+  .footer{margin-top:28px}
+}
+@media(max-width:520px){
+  .hero{flex-direction:column;align-items:flex-start}
+  .hero > div{margin-left:0!important;text-align:left!important}
+  .hero .score{margin-top:10px!important}
+  .mvp{flex-direction:column;align-items:flex-start;gap:10px}
+  .mvp > div{margin-left:0!important;text-align:left!important}
+  .mvp .big{font-size:28px}
+  .k-val{font-size:22px}
+  header.hero .tags{margin-left:0}
+  .setbox{padding:7px 10px}
+  .setbox .sp{font-size:16px}
+  .bar-row .bl{width:80px;font-size:12.5px}
+  .bar-row .bv{width:90px}
+}
+html{-webkit-text-size-adjust:100%}
+.legend-item .grow{flex:1}
+@media(max-width:800px){
+  .tbl-wrap td:first-child,.tbl-wrap th:first-child,table[data-fname="match"] td:first-child,table[data-fname="match"] th:first-child{position:sticky;left:0;z-index:2;background:var(--card);box-shadow:1px 0 0 var(--line)}
+  .tbl-wrap thead th:first-child{z-index:4}
+}
+@media(max-width:640px){
+  nav.tabs{position:sticky;top:0;z-index:20;background:var(--bg);flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:-12px;margin-right:-12px;padding:8px 12px}
+  nav.tabs::-webkit-scrollbar{display:none}
+  .tab{flex:none;white-space:nowrap}
+  .chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+  .chip{flex:none;white-space:nowrap}
+  .tab,.chip,.export-btn,.theme-btn{min-height:40px}
+  input,select{font-size:16px}
+  .filter-bar label,#mf-name{min-width:0!important;width:100%}
+  .filter-bar label{flex:1 1 140px}
+  .legend-item[style*="align-items:center"]{flex-wrap:wrap;gap:4px 12px}
+  .legend-item[style*="align-items:center"]>div{width:auto!important;flex:1 1 auto!important;text-align:left!important}
+  .legend-item[style*="align-items:center"]>div:first-child{flex-basis:100%!important}
+  .card{padding:14px}
+  .k-val{font-size:22px}
+}
+@media(max-width:520px){
+  .bar-row{flex-wrap:wrap;gap:3px 8px}
+  .bar-row .bl{width:auto;flex:1}
+  .bar-row .bar{order:9;flex:1 1 100%}
+  .bar-row .bv{width:auto}
+  .section-title h2{white-space:normal}
+}
+input,select{background:var(--bg2);color:var(--txt);border:1px solid var(--line2);border-radius:10px;padding:8px 12px;font:inherit}
+input:focus,select:focus{outline:2px solid var(--acc);outline-offset:1px}
+svg{max-width:100%;height:auto}
+.big small{display:block;font-size:11px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.bar-row .bpos,.bar-row .bneg{width:auto;min-width:78px;white-space:nowrap}
+[data-theme="light"] header.hero h1{background-image:linear-gradient(90deg,#0f2a43,#0d9488)}
+[data-theme="light"] .rankbadge.g1{background:#f6e27a66;color:#8a6d00;border-color:#c9a400}
+[data-theme="light"] .rankbadge.g2{background:#c8d4e666;color:#4a5a73;border-color:#9aa9c2}
+[data-theme="light"] .rankbadge.g3{background:#e4936b44;color:#a2532a;border-color:#d98a5f}
+.spk{width:100%;height:56px;display:block;margin:6px 0 2px}
+.ph th,.ph td{padding:8px 9px}
+.ph th{cursor:default}
+details.fold{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:14px}
+details.fold>summary{cursor:pointer;padding:14px 18px;font-weight:700;list-style:none;display:flex;align-items:center;gap:8px;min-height:44px}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::before{content:'▸';color:var(--dim);transition:transform .15s}
+details.fold[open]>summary::before{transform:rotate(90deg)}
+details.fold>.fold-body{padding:0 14px 14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div>
+      <h1>SKYLINE · Волейбольная статистика</h1>
+      <div class="sub">Осень 2026 — метрики пересчитываются из данных xlsx</div>
+    </div>
+    <div class="tags">
+      <span class="tag">Матчей: <b id="tag-games">–</b></span>
+      <span class="tag" style="display:none">Игроков: <b id="tag-players">–</b></span>
+      <span class="tag no-print" style="display:none">Данные: xlsx · метрики на странице</span>
+      <button id="theme-btn" class="theme-btn no-print" type="button" title="Переключить тему оформления" aria-label="Переключить тему оформления">Тема</button>
+    </div>
+  </header>
+
+  <noscript><div style="padding:18px 20px;margin:6px 0 14px;background:#fff8d9;color:#6b5200;border:1px solid #e6d488;border-radius:12px">Для работы страницы необходим включённый JavaScript — все метрики вычисляются локально в браузере.</div></noscript>
+
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Разделы"></nav>
+
+  <section class="view" id="v-overview"></section>
+  <section class="view" id="v-ranking"></section>
+  <section class="view" id="v-matches"></section>
+  <section class="view" id="v-players"></section>
+  <section class="view" id="v-method"></section>
+
+  <div class="footer">Данные: xlsx · метрики считаются на странице (см. «Методика») · последний матч: <span id="gen-date">–</span></div>
+</div>
+
+<script>
+const DATA =
+{"players":["Артем Бондарчук","Илья Иванов","Максим Битько","Евгений Мартопляс","Михаил Ярмолович","Артем Демин","Владимир Туромша","Даниил Тюрюханов","Иван Шумик","Павел Чекан"],"games":[{"dt":"16.09","opp":"Perekati pole","tm":{"op":[11.0,6.0,5.0,6.0,0,28.0],"pt":[25,19,25,25,0,94],"er":[17,19,14,17,0,67],"uf":[7.0,5.0,3.0,10.0,0,25.0],"q":[18,25,21,23,0,87]},"pl":[[{"p":[4.0,17.0,4.0,1.0,26.0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,1.0,0,0,0,1.0],"pd":[0,0,0,0],"b":[1.0,0,1.5,2.5],"s":[0,1.0,0,2.0,3.0]},{"p":[4.0,17.0,2.0,0,23.0],"a":[0,0,1.0,1.0,0,2.0],"r":[0,0,0,0,0,0],"df":[0,3.0,0,0,3.0,6.0],"pd":[1.0,0,0,1.0],"b":[1.0,0,1.0,2.0],"s":[2.0,0,0,1.0,3.0]},{"p":[9.0,20.0,5.0,0,34.0],"a":[0,0,0,0,1.0,0],"r":[0,0,0,0,0,0],"df":[0,1.0,1.0,0,0,2.0],"pd":[2.0,0,0,2.0],"b":[1.0,0,0.5,1.5],"s":[4.0,2.0,0,1.0,7.0]},{"p":[8.0,23.0,5.0,2.0,38.0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,1.0,1.0,1.0,0,3.0],"pd":[0,0,1.0,1.0],"b":[2.0,0.5,0.5,3.0],"s":[2.0,0,0,1.0,3.0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[25.0,77.0,16.0,3.0,121.0],"a":[0,0,1.0,1.0,1.0,2.0],"r":[0,0,0,0,0,0],"df":[0,6.0,2.0,1.0,3.0,12.0],"pd":[3.0,0,1.0,4.0],"b":[5.0,0.5,3.5,9.0],"s":[8.0,3.0,0,5.0,16.0]}],[{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]}],[{"p":[0,0,0,0,0],"a":[1.0,3.0,0,0,0,4.0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[1.0,0,0,1.0],"b":[3.5,0,1.0,4.5],"s":[0,1.0,0,1.0,2.0]},{"p":[0,0,0,0,0],"a":[1.0,0,3.0,0,1.0,4.0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[2.0,0,0,2.0],"b":[2.0,0.5,1.0,3.5],"s":[0,2.0,0,0,2.0]},{"p":[1.0,0,1.0,0,2.0],"a":[1.0,3.0,4.0,0,0,8.0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[3.0,0,0,3.0],"b":[2.0,1.0,2.0,5.0],"s":[2.0,1.0,0,0,3.0]},{"p":[2.0,0,0,0,2.0],"a":[0,1.0,1.0,1.0,0,3.0],"r":[0,0,0,0,0,0],"df":[0,1.0,0,0,0,1.0],"pd":[0,0,1.0,1.0],"b":[0.5,2.5,1.0,4.0],"s":[1.0,3.0,1.0,1.0,6.0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[3.0,0,1.0,0,4.0],"a":[3.0,7.0,8.0,1.0,1.0,19.0],"r":[0,0,0,0,0,0],"df":[0,1.0,0,0,0,1.0],"pd":[6.0,0,1.0,7.0],"b":[8.0,4.0,5.0,17.0],"s":[3.0,7.0,1.0,2.0,13.0]}],[{"p":[1.0,0,1.0,0,2.0],"a":[0,4.0,2.0,2.0,2.0,8.0],"r":[0,6.0,1.0,0,1.0,8.0],"df":[1.0,0,1.0,1.0,0,3.0],"pd":[1.0,0,0,1.0],"b":[0.5,0,0.5,1.0],"s":[1.0,1.0,1.0,0,3.0]},{"p":[1.0,0,1.0,0,2.0],"a":[0,1.0,2.0,0,1.0,3.0],"r":[3.0,4.0,5.0,1.0,1.0,14.0],"df":[0,2.0,1.0,0,1.0,4.0],"pd":[0,0,0,0],"b":[0.5,0,0,0.5],"s":[2.0,0,1.0,0,3.0]},{"p":[0,0,1.0,0,1.0],"a":[2.0,3.0,1.0,1.0,1.0,7.0],"r":[0,5.0,0,0,0,5.0],"df":[1.0,1.0,2.0,0,0,4.0],"pd":[2.0,0,0,2.0],"b":[0,0.5,1.0,1.5],"s":[1.0,0,0,1.0,2.0]},{"p":[1.0,0,0,0,1.0],"a":[2.0,2.0,3.0,2.0,0,9.0],"r":[2.0,3.0,3.0,0,0,8.0],"df":[2.0,2.0,0,0,1.0,5.0],"pd":[1.0,0,0,1.0],"b":[1.0,0,0,1.0],"s":[0,0,0,1.0,1.0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[3.0,0,3.0,0,6.0],"a":[4.0,10.0,8.0,5.0,4.0,27.0],"r":[5.0,18.0,9.0,1.0,2.0,35.0],"df":[4.0,5.0,4.0,1.0,2.0,16.0],"pd":[4.0,0,0,4.0],"b":[2.0,0.5,1.5,4.0],"s":[4.0,1.0,2.0,2.0,9.0]}],[{"p":[1.0,0,0,0,1.0],"a":[0,0,0,0,1.0,0],"r":[2.0,2.0,0,0,0,4.0],"df":[0,1.0,3.0,0,0,4.0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,1.0,0],"r":[1.0,3.0,1.0,0,2.0,7.0],"df":[0,1.0,0,0,2.0,3.0],"pd":[1.0,0,0,1.0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[1.0,0,1.0,0,2.0],"a":[0,0,1.0,0,2.0,1.0],"r":[4.0,2.0,2.0,0,0,8.0],"df":[1.0,0,3.0,1.0,2.0,7.0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[1.0,3.0,2.0,0,0,6.0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[2.0,0,1.0,0,3.0],"a":[0,0,1.0,0,4.0,1.0],"r":[8.0,10.0,5.0,0,2.0,25.0],"df":[1.0,2.0,6.0,1.0,4.0,14.0],"pd":[1.0,0,0,1.0],"b":[0,0,0,0],"s":[0,0,0,0,0]}],[{"p":[0,0,0,0,0],"a":[0,1.0,2.0,1.0,1.0,4.0],"r":[2.0,2.0,0,0,0,4.0],"df":[0,0,4.0,1.0,1.0,6.0],"pd":[0,0,0,0],"b":[1.0,0,0,1.0],"s":[2.0,0,0,1.0,3.0]},{"p":[2.0,1.0,3.0,0,6.0],"a":[2.0,1.0,3.0,2.0,1.0,8.0],"r":[1.0,0,0,0,0,1.0],"df":[0,0,0,0,0,0],"pd":[1.0,0,0,1.0],"b":[1.5,0,1.0,2.5],"s":[1.0,1.0,0,2.0,4.0]},{"p":[0,1.0,0,0,1.0],"a":[3.0,0,2.0,0,1.0,5.0],"r":[3.0,2.0,2.0,0,0,7.0],"df":[2.0,2.0,2.0,0,0,6.0],"pd":[1.0,0,0,1.0],"b":[0.5,0.5,1.5,2.5],"s":[2.0,1.0,0,0,3.0]},{"p":[0,0,0,0,0],"a":[1.0,0,1.0,1.0,0,3.0],"r":[2.0,4.0,0,0,1.0,7.0],"df":[0,0,1.0,1.0,0,2.0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[3.0,1.0,0,0,4.0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[2.0,2.0,3.0,0,7.0],"a":[6.0,2.0,8.0,4.0,3.0,20.0],"r":[8.0,8.0,2.0,0,1.0,19.0],"df":[2.0,2.0,7.0,2.0,1.0,14.0],"pd":[2.0,0,0,2.0],"b":[3.0,0.5,2.5,6.0],"s":[8.0,3.0,0,3.0,14.0]}],[{"p":[2.0,0,2.0,0,4.0],"a":[0,1.0,0,1.0,1.0,2.0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[1.0,0,0,1.0],"b":[2.0,0,1.0,3.0],"s":[2.0,0,1.0,0,3.0]},{"p":[0,1.0,0,0,1.0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[1.0,0,0,1.0],"b":[2.0,0,0,2.0],"s":[2.0,0,0,1.0,3.0]},{"p":[0,0,0,0,0],"a":[1.0,0,0,0,1.0,1.0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[3.0,0,0,3.0],"b":[0.5,1.0,2.0,3.5],"s":[2.0,0,0,0,2.0]},{"p":[0,2.0,0,0,2.0],"a":[0,2.0,1.0,0,1.0,3.0],"r":[0,0,0,0,0,0],"df":[1.0,0,1.0,0,0,2.0],"pd":[0,0,0,0],"b":[0.5,0,0,0.5],"s":[4.0,2.0,3.0,0,9.0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[2.0,3.0,2.0,0,7.0],"a":[1.0,3.0,1.0,1.0,3.0,6.0],"r":[0,0,0,0,0,0],"df":[1.0,0,1.0,0,0,2.0],"pd":[5.0,0,0,5.0],"b":[5.0,1.0,3.0,9.0],"s":[10.0,2.0,4.0,1.0,17.0]}],[{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]}],[{"p":[0,0,0,0,0],"a":[2.0,0,6.0,0,0,8.0],"r":[0,0,0,0,0,0],"df":[1.0,0,0,0,0,1.0],"pd":[2.0,0,0,2.0],"b":[0.5,0,0,0.5],"s":[3.0,2.0,2.0,2.0,9.0]},{"p":[0,0,0,0,0],"a":[5.0,3.0,2.0,0,0,10.0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[1.0,0.5,0,1.5],"s":[2.0,1.0,0,0,3.0]},{"p":[0,0,0,0,0],"a":[2.0,7.0,6.0,0,2.0,15.0],"r":[0,0,0,0,0,0],"df":[0,0,1.0,1.0,1.0,3.0],"pd":[1.0,0,1.0,2.0],"b":[1.0,1.0,0,2.0],"s":[1.0,2.0,2.0,0,5.0]},{"p":[0,0,0,0,0],"a":[7.0,5.0,5.0,1.0,1.0,18.0],"r":[0,0,0,0,0,0],"df":[0,1.0,0,2.0,1.0,4.0],"pd":[4.0,0,0,4.0],"b":[0,1.0,0.5,1.5],"s":[1.0,1.0,0,0,2.0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[16.0,15.0,19.0,1.0,3.0,51.0],"r":[0,0,0,0,0,0],"df":[1.0,1.0,1.0,3.0,2.0,8.0],"pd":[7.0,0,1.0,8.0],"b":[2.5,2.5,0.5,5.5],"s":[7.0,6.0,4.0,2.0,19.0]}],[{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]}]],"rl":[[[0,"F","Передача","","",[0]],[1,"W","Атака","Блок","Т/До",[8]],[0,"F","Подача","Аут","",[0]],[0,"F","Атака","Аут","",[3]],[0,"F","Прием","Подача","До",[3]],[1,"E","Аут","Подача","До",[]],[1,"E","Сетка","Атака","Ди",[]],[0,"F","Подача","Аут","",[5]],[1,"W","Атака","Защита","Т",[3]],[0,"F","Подача","Аут","",[2]],[1,"W","Атака","","",[3]],[0,"F","Подача","Аут","",[8]],[0,"F","Защита","Атака","До",[5]],[1,"W","Атака","Защита","Л",[8]],[0,"F","Блок","Атака","До",[6,0]],[1,"E","Сетка","Подача","Т",[]],[1,"E","Аут","Атака","Т",[]],[0,"F","Блок","Атака","До",[2,0]],[0,"O","","Атака","До",[]],[1,"E","Аут","Подача","С",[]],[1,"W","Атака","","",[8]],[0,"F","Подача","Аут","",[0]],[1,"W","Атака","","",[5]],[0,"F","Блок","Атака","Ди",[2,3]],[1,"W","Атака","","",[8]],[0,"F","Атака","Аут","",[3]],[1,"E","Аут","Атака","Ди",[]],[1,"W","Подача","Прием","Л",[8]],[1,"W","Подача","Прием","Л",[8]],[1,"E","Сетка","Атака","До",[]],[1,"E","Аут","Атака","Ди",[]],[1,"E","Аут","Атака","Т",[]],[1,"E","Сетка","Атака","До",[]],[1,"W","Атака","Защита","Л",[8]],[0,"F","Подача","Аут","",[8]],[1,"E","Аут","Атака","Т",[]],[1,"W","Подача","Прием","Л",[3]],[0,"F","Блок","Атака","До",[6,0]],[0,"F","Атака","Блок","Т/C",[5]],[0,"F","Атака","Блок","Т",[6]],[1,"W","Атака","","",[5]],[1,"W","Атака","Защита","Ди",[8]],[1,"W","Подача","Эйс","",[6]]],[[0,"F","Защита","Атака","До",[0]],[0,"F","Защита","Атака","С",[0]],[0,"F","Прием","Подача","С",[4]],[1,"E","Сетка","Подача","С",[]],[1,"W","Блок","Атака","До",[2,8]],[0,"F","Подача","Аут","",[5]],[0,"F","Прием","Подача","До",[3]],[1,"W","Атака","","",[3]],[0,"F","Защита","Атака","До",[0]],[1,"W","Атака","","",[8]],[1,"W","Атака","Защита","До",[8]],[0,"O","","Атака","Т",[]],[1,"E","Аут","Подача","Ди",[]],[1,"W","Подача","Прием","Л",[3]],[0,"F","Атака","Аут","",[0]],[1,"W","Атака","Блок","Т/С",[5]],[1,"E","Сетка","Атака","До",[]],[0,"F","Подача","Аут","",[6]],[0,"F","Блок","Атака","До",[2,0]],[0,"F","Атака","Аут","",[5]],[1,"E","","Атака","До",[]],[0,"F","Блок","Атака","С",[5]],[1,"W","Атака","","",[2]],[0,"F","Защита","Атака","Ди",[4]],[0,"O","","Атака","Т",[]],[1,"W","Атака","Защита","До",[2]],[0,"O","","Атака","До",[]],[1,"W","Атака","Блок","Т/Ди",[3]],[0,"O","","Атака","До",[]],[1,"W","Атака","Защита","До",[0]],[0,"F","Защита","Атака","До",[3]],[0,"F","Защита","Атака","Ди",[4]],[0,"F","Атака","Блок","Т/С",[5]],[0,"O","","Атака","Т",[]],[1,"W","Атака","Блок","Т/С",[5]],[1,"E","Аут","Атака","До",[]],[0,"F","Блок","Атака","До",[2,0]],[1,"W","Атака","Блок","Т",[2]],[0,"F","Подача","Сетка","",[0]],[0,"O","","Атака","До",[]],[0,"F","Прием","Подача","С",[4]],[1,"W","Атака","Блок","И/До",[5]],[1,"E","Сетка","Атака","Ди",[]],[0,"F","Подача","Аут","",[5]]],[[1,"W","Атака","Защита","Л",[2]],[1,"W","Атака","","",[2]],[0,"F","Подача","Аут","",[0]],[1,"W","Атака","Защита","До",[8]],[0,"O","","Атака","До",[]],[1,"W","Атака","Блок","Т/До",[8]],[0,"F","Атака","Блок","Т/Ди",[3]],[0,"F","Блок","Атака","Ди",[6,3]],[1,"W","Атака","Защита","Ди",[8]],[1,"W","Подача","Прием","До",[8]],[0,"F","Защита","Атака","До",[4]],[0,"O","","Атака","С",[]],[0,"O","","Атака","С",[]],[1,"W","Атака","Защита","Ди",[8]],[0,"F","Блок","Атака","До",[6,0]],[0,"F","Подбор","","",[8]],[0,"F","Защита","Атака","До",[4]],[1,"W","Атака","Защита","Т",[8]],[0,"F","Блок","Атака","Ди",[2,5]],[1,"W","Атака","Блок","Т/Ди",[5]],[1,"W","Блок","Атака","До",[2,8]],[0,"F","Блок","Атака","Ди",[2,5]],[0,"O","","Атака","Т",[]],[1,"W","Атака","","",[5]],[0,"F","Блок","Атака","Ди",[2,3]],[1,"W","Атака","Защита","С",[2]],[1,"W","Блок","Атака","До",[6,8]],[0,"F","Блок","","",[6,3]],[1,"E","Аут","Подача","Ди",[]],[1,"W","Подача","Прием","Л",[8]],[0,"F","Блок","Атака","Т",[6]],[1,"W","Атака","Защита","Л",[3]],[0,"F","Подача","Сетка","",[3]],[1,"E","Сетка","Атака","Т",[]],[0,"F","Блок","Атака","Ди",[2,5]],[1,"W","Защита","","",[4]],[1,"E","Сетка","Атака","Т",[]],[1,"E","Аут","Атака","Ди",[]],[1,"W","Блок","Атака","До",[2,5]],[1,"E","","Подбор","Л",[]],[1,"W","Атака","Защита","До",[2]],[0,"O","","Атака","Ди",[]],[0,"F","Защита","Атака","До",[8]],[1,"W","Атака","Защита","Л",[8]],[0,"O","","Атака","Т",[]],[1,"E","Сетка","Подача","Т",[]]],[[0,"F","Подача","Аут","",[0]],[0,"F","Передача","","",[0]],[1,"E","Сетка","Блок","Т/Ди",[]],[1,"W","Атака","Защита","Л",[8]],[0,"F","Передача","","",[0]],[0,"F","Прием","Подача","До",[5]],[1,"W","Блок","Атака","Ди",[8]],[1,"W","Подача","Прием","Л",[2]],[1,"E","Сетка","Атака","Т",[]],[0,"O","","Атака","До",[]],[0,"F","Подбор","","",[0]],[1,"W","Атака","","",[3]],[0,"F","Атака","Аут","",[8]],[0,"F","Атака","Блок","Т/С",[3]],[1,"W","Атака","Защита","До",[8]],[0,"F","Подача","Аут","",[3]],[1,"W","Атака","","",[6]],[1,"W","Атака","Защита","До",[3]],[1,"W","Подача","Эйс","",[6]],[1,"W","Блок","Атака","До",[2]],[0,"F","Защита","Атака","До",[8]],[0,"F","Атака","Блок","Т",[2]],[1,"E","Аут","Подача","Т",[]],[0,"O","","Атака","До",[]],[0,"F","Блок","Атака","До",[2,0]],[0,"F","Подбор","","",[2]],[0,"F","Атака","Сетка","",[5]],[0,"F","Защита","","",[3]],[1,"W","Атака","Блок","Т/До",[2]],[0,"F","Блок","Атака","До",[2,8]],[1,"W","Атака","Защита","Ди",[8]],[1,"W","Атака","Защита","Л",[8]],[1,"E","","Передеча","С",[]],[0,"F","Подача","Аут","",[2]],[0,"O","","Атака","С",[]],[0,"F","Атака","Блок","Т/Ди",[3]],[0,"O","","Атака","До",[]],[1,"W","Атака","Защита","До",[3]],[0,"O","","Атака","До",[]],[1,"E","Сетка","Атака","До",[]],[0,"O","","Атака","Т",[]],[1,"W","Атака","","",[5]],[1,"E","","Передача","До",[]],[1,"W","Подача","Прием","Т",[6]],[1,"W","Подача","Прием","Л",[6]],[1,"W","Атака","","",[8]],[1,"W","Блок","Атака","Т",[2]],[1,"W","Блок","Атака","До",[2,0]]],[]]},{"dt":"30.09","opp":"Black Wasp","tm":{"op":[13.0,9.0,8.0,8.0,0,38.0],"pt":[22,25,25,25,0,97],"er":[19,15,13,15,0,62],"uf":[10.0,6.0,7.0,9.0,0,32.0],"q":[25,19,18,18,0,80]},"pl":[[{"p":[5.0,11.0,1.0,1.0,18.0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[1.0,0,2.0,0,0,3.0],"pd":[0,0,0,0],"b":[0.5,0,0,0.5],"s":[2.0,0,0,1.0,3.0]},{"p":[5.0,13.0,1.0,1.0,20.0],"a":[0,0,0,0,1.0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0.5,0.5,0.5,1.5],"s":[0,1.0,0,1.0,2.0]},{"p":[4.0,11.0,3.0,1.0,19.0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[1.0,0,1.0,2.0],"b":[0.5,0,0,0.5],"s":[0,2.0,0,1.0,3.0]},{"p":[6.0,18.0,1.0,0,25.0],"a":[0,0,0,0,1.0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,1.0,0,1.0],"pd":[0,0,0,0],"b":[0.5,0,0,0.5],"s":[2.0,2.0,0,1.0,5.0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[20.0,53.0,6.0,3.0,82.0],"a":[0,0,0,0,2.0,0],"r":[0,0,0,0,0,0],"df":[1.0,0,2.0,1.0,0,4.0],"pd":[1.0,0,1.0,2.0],"b":[2.0,0.5,0.5,3.0],"s":[4.0,5.0,0,4.0,13.0]}],[{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]}],[{"p":[1.0,0,1.0,1.0,3.0],"a":[0,3.0,0,1.0,0,4.0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,1.0,1.0],"b":[0,0,0,0],"s":[6.0,2.0,0,0,8.0]},{"p":[0,0,0,0,0],"a":[1.0,0,2.0,0,0,3.0],"r":[0,0,0,0,0,0],"df":[0,1.0,1.0,0,0,2.0],"pd":[0,0,0,0],"b":[2.5,0.5,1.0,4.0],"s":[4.0,1.0,0,0,5.0]},{"p":[1.0,1.0,1.0,0,3.0],"a":[0,0,2.0,0,0,2.0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[1.0,0.5,0,1.5],"s":[2.0,2.0,1.0,2.0,7.0]},{"p":[0,2.0,0,0,2.0],"a":[3.0,2.0,0,0,1.0,5.0],"r":[0,0,0,0,0,0],"df":[0,1.0,0,0,0,1.0],"pd":[1.0,0,0,1.0],"b":[4.0,0,1.5,5.5],"s":[1.0,1.0,0,2.0,4.0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[2.0,3.0,2.0,1.0,8.0],"a":[4.0,5.0,4.0,1.0,1.0,14.0],"r":[0,0,0,0,0,0],"df":[0,2.0,1.0,0,0,3.0],"pd":[1.0,0,1.0,2.0],"b":[7.5,1.0,2.5,11.0],"s":[13.0,6.0,1.0,4.0,24.0]}],[{"p":[0,0,0,0,0],"a":[0,2.0,1.0,1.0,0,4.0],"r":[5.0,1.0,0,0,1.0,7.0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,2.0,0,1.0,3.0]},{"p":[1.0,0,1.0,0,2.0],"a":[0,0,1.0,2.0,2.0,3.0],"r":[1.0,3.0,0,1.0,0,5.0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0.5,0.5,0.5,1.5],"s":[3.0,1.0,0,0,4.0]},{"p":[0,0,0,0,0],"a":[2.0,1.0,1.0,1.0,0,5.0],"r":[2.0,3.0,0,0,1.0,6.0],"df":[0,1.0,1.0,0,0,2.0],"pd":[1.0,0,1.0,2.0],"b":[2.0,0,0,2.0],"s":[3.0,1.0,1.0,0,5.0]},{"p":[0,0,0,0,0],"a":[2.0,1.0,5.0,0,0,8.0],"r":[2.0,3.0,0,0,0,5.0],"df":[2.0,3.0,0,0,2.0,7.0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[2.0,0,0,0,2.0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[1.0,0,1.0,0,2.0],"a":[4.0,4.0,8.0,4.0,2.0,20.0],"r":[10.0,10.0,0,1.0,2.0,23.0],"df":[2.0,4.0,1.0,0,2.0,9.0],"pd":[1.0,0,1.0,2.0],"b":[2.5,0.5,0.5,3.5],"s":[8.0,4.0,1.0,1.0,14.0]}],[{"p":[0,0,0,0,0],"a":[1.0,1.0,1.0,0,1.0,3.0],"r":[2.0,4.0,0,0,1.0,7.0],"df":[0,1.0,0,1.0,0,2.0],"pd":[2.0,0,0,2.0],"b":[0,0,0,0],"s":[1.0,1.0,0,1.0,3.0]},{"p":[0,0,0,0,0],"a":[1.0,0,4.0,1.0,0,6.0],"r":[2.0,2.0,1.0,0,1.0,6.0],"df":[0,0,1.0,0,1.0,2.0],"pd":[0,0,1.0,1.0],"b":[0,0,0.5,0.5],"s":[1.0,1.0,0,0,2.0]},{"p":[0,0,0,0,0],"a":[1.0,1.0,3.0,0,1.0,5.0],"r":[4.0,0,0,0,0,4.0],"df":[0,5.0,0,0,0,5.0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[3.0,1.0,0,1.0,5.0]},{"p":[0,0,0,0,0],"a":[3.0,0,4.0,2.0,0,9.0],"r":[1.0,3.0,2.0,0,0,6.0],"df":[0,0,0,1.0,0,1.0],"pd":[2.0,0,0,2.0],"b":[0,0,1.0,1.0],"s":[1.0,1.0,3.0,2.0,7.0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[6.0,2.0,12.0,3.0,2.0,23.0],"r":[9.0,9.0,3.0,0,2.0,23.0],"df":[0,6.0,1.0,2.0,1.0,10.0],"pd":[4.0,0,1.0,5.0],"b":[0,0,1.5,1.5],"s":[6.0,4.0,3.0,4.0,17.0]}],[{"p":[2.0,0,1.0,0,3.0],"a":[0,0,0,0,1.0,0],"r":[1.0,3.0,0,0,0,4.0],"df":[0,0,0,0,2.0,2.0],"pd":[1.0,0,0,1.0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[1.0,3.0,1.0,0,0,5.0],"df":[0,1.0,1.0,0,0,2.0],"pd":[1.0,0,0,1.0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[3.0,0,2.0,0,5.0],"a":[0,0,1.0,0,0,1.0],"r":[3.0,0,0,0,2.0,5.0],"df":[0,1.0,1.0,0,0,2.0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[1.0,0,0,0,1.0],"a":[0,0,0,0,0,0],"r":[2.0,4.0,1.0,0,0,7.0],"df":[3.0,1.0,0,1.0,1.0,6.0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[6.0,0,3.0,0,9.0],"a":[0,0,1.0,0,1.0,1.0],"r":[7.0,10.0,2.0,0,2.0,21.0],"df":[3.0,3.0,2.0,1.0,3.0,12.0],"pd":[2.0,0,0,2.0],"b":[0,0,0,0],"s":[0,0,0,0,0]}],[{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]}],[{"p":[0,0,0,0,0],"a":[0,1.0,0,0,1.0,1.0],"r":[0,0,1.0,0,0,1.0],"df":[0,0,1.0,0,1.0,2.0],"pd":[0,0,0,0],"b":[0.5,2.5,2.0,5.0],"s":[0,1.0,0,1.0,2.0]},{"p":[0,0,0,0,0],"a":[0,0,2.0,0,0,2.0],"r":[0,0,0,0,0,0],"df":[2.0,0,1.0,0,0,3.0],"pd":[0,0,0,0],"b":[2.0,0.5,1.0,3.5],"s":[0,3.0,2.0,1.0,6.0]},{"p":[0,0,0,0,0],"a":[0,0,1.0,0,0,1.0],"r":[0,0,0,0,0,0],"df":[0,0,1.0,0,1.0,2.0],"pd":[0,0,0,0],"b":[2.0,0,0,2.0],"s":[1.0,1.0,1.0,0,3.0]},{"p":[0,0,0,0,0],"a":[0,1.0,2.0,1.0,0,4.0],"r":[0,0,0,0,0,0],"df":[1.0,0,0,0,0,1.0],"pd":[0,0,0,0],"b":[1.0,0.5,0,1.5],"s":[2.0,1.0,0,0,3.0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,2.0,5.0,1.0,1.0,8.0],"r":[0,0,1.0,0,0,1.0],"df":[3.0,0,3.0,0,2.0,8.0],"pd":[0,0,0,0],"b":[5.5,3.5,3.0,12.0],"s":[3.0,6.0,3.0,2.0,14.0]}],[{"p":[0,0,0,0,0],"a":[2.0,1.0,4.0,0,1.0,7.0],"r":[0,0,0,0,1.0,1.0],"df":[0,1.0,1.0,0,0,2.0],"pd":[0,0,0,0],"b":[0,0.5,0,0.5],"s":[2.0,0,0,2.0,4.0]},{"p":[0,0,0,0,0],"a":[1.0,1.0,2.0,0,0,4.0],"r":[0,0,0,0,0,0],"df":[0,0,0,1.0,1.0,2.0],"pd":[0,1.0,0,1.0],"b":[0.5,0,0.5,1.0],"s":[1.0,1.0,1.0,1.0,4.0]},{"p":[0,0,0,0,0],"a":[3.0,0,5.0,0,1.0,8.0],"r":[0,0,0,0,0,0],"df":[1.0,0,0,0,1.0,2.0],"pd":[1.0,0,0,1.0],"b":[1.5,0.5,0,2.0],"s":[1.0,1.0,0,0,2.0]},{"p":[0,0,0,0,0],"a":[2.0,0,2.0,0,0,4.0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,1.0,0,1.0],"b":[2.5,0.5,0.5,3.5],"s":[1.0,1.0,0,1.0,3.0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[8.0,2.0,13.0,0,2.0,23.0],"r":[0,0,0,0,1.0,1.0],"df":[1.0,1.0,1.0,1.0,2.0,6.0],"pd":[1.0,2.0,0,3.0],"b":[4.5,1.5,1.0,7.0],"s":[5.0,3.0,1.0,4.0,13.0]}],[{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]}]],"rl":[[[0,"F","Подача","Аут","",[0]],[1,"E","Аут","Атака","До",[]],[0,"F","Защита","Атака","До",[5]],[1,"E","Сетка","Подача","До",[]],[1,"W","Блок","Атака","Т",[7]],[1,"E","Аут","Атака","До",[]],[1,"E","Аут","Атака","Ди",[]],[1,"W","Блок","Атака","До",[7,8]],[0,"F","Блок","Сетка","",[7]],[0,"F","Блок","Атака","Ди",[7]],[1,"W","Атака","","",[3]],[1,"W","Блок","Атака","До",[7]],[0,"F","Подача","Сетка","",[8]],[1,"E","Аут","Подача","Ди",[]],[1,"W","Атака","Блок","С",[4]],[0,"F","Подача","Сетка","",[3]],[1,"W","Атака","Защита","Ди",[8]],[0,"F","Подача","Аут","",[7]],[1,"E","","Подбор","С",[]],[0,"O","","Атака","До",[]],[1,"W","Атака","Защита","Л",[8]],[0,"F","Подача","Сетка","",[4]],[1,"E","Сетка","Блок","Т",[]],[0,"F","Подбор","","",[2]],[0,"F","Прием","Подача","Т",[4]],[0,"F","Прием","Подача","Т",[3]],[1,"E","Аут","Подача","Т",[]],[0,"F","Блок","Атака","Ди",[7,3]],[0,"F","Атака","Блок","Т/C",[3]],[1,"E","Сетка","Атака","С",[]],[0,"O","","Атака","До",[]],[0,"F","Прием","Подача","До",[8]],[1,"E","Сетка","Подача","До",[]],[0,"F","Защита","Атака","До",[7]],[0,"F","Защита","Атака","Ди",[5]],[1,"E","Аут","Атака","До",[]],[0,"O","","Атака","Т",[]],[0,"F","Передача","","",[5]],[1,"E","Сетка","Блок","Т/Ди",[]],[0,"O","","Атака","До",[]],[0,"F","Передача","","",[2]],[0,"F","Атака","Блок","Т",[2]],[1,"E","Сетка","Блок","Т/Ди",[]],[1,"W","Атака","Защита","Л",[8]],[0,"O","","Атака","Т",[]],[1,"W","Атака","Блок","До",[8]],[0,"F","Подача","Сетка","",[8]]],[[0,"F","Защита","Атака","Ди",[8]],[0,"F","Прием","Подача","С",[4]],[0,"F","Блок","Атака","До",[2,0]],[1,"E","Сетка","Подача","С",[]],[0,"F","Подача","Аут","",[4]],[1,"E","Аут","Подача","До",[]],[0,"F","Блок","Сетка","",[8,2]],[1,"W","Атака","","",[8]],[1,"W","Блок","Атака","Ди",[7,3]],[1,"E","Аут","Атака","Т",[]],[0,"F","Защита","Атака","Ди",[4]],[1,"W","Атака","","",[4]],[1,"E","","Расстановка","Л",[]],[0,"F","Подача","Аут","",[8]],[0,"O","Эйс","Подача","До",[]],[1,"E","Аут","Атака","До",[]],[0,"O","","Атака","С",[]],[1,"W","Атака","Блок","Т/До",[7]],[1,"W","Подача","Прием","До",[7]],[1,"W","Атака","","",[2]],[1,"W","Атака","Защита","Л",[2]],[1,"E","","Передача","С",[]],[0,"F","Подача","Аут","",[7]],[1,"E","Сетка","Блок","Т",[]],[0,"F","Передача","","",[0]],[1,"W","Атака","Блок","Т/До",[4]],[0,"F","Атака","Блок","Т/Ди",[3]],[0,"F","Атака","Сетка","",[3]],[0,"F","Атака","Блок","Т",[4]],[0,"F","Атака","Блок","Т/Ди",[3]],[1,"E","Сетка","Блок","Т/До",[]],[1,"W","Атака","","",[3]],[0,"F","Блок","Атака","Ди",[7,3]],[1,"W","Атака","Защита","Л",[7]],[1,"W","Подача","Прием","До",[8]],[0,"F","Подбор","","",[4]],[0,"O","Эйс","Подача","До",[]],[1,"W","Атака","Защита","Ди",[8]],[1,"E","Сетка","Атака","Ди",[]],[1,"W","Атака","Блок","Т/С",[4]],[0,"F","Блок","Атака","Т",[7,4]],[1,"W","Атака","Блок","Т/С",[4]],[1,"W","Блок","Атака","До",[2,0]],[1,"W","Подача","Эйс","",[7]]],[[0,"O","","Атака","Т",[]],[0,"F","Подбор","","",[0]],[1,"W","Атака","","",[8]],[1,"E","Аут","Атака","Ди",[]],[0,"O","","Атака","До",[]],[0,"F","Подбор","","",[3]],[0,"F","Передача","","",[0]],[0,"F","Прием","Подача","До",[5]],[0,"F","Прием","Подача","До",[5]],[1,"E","Аут","Подача","До",[]],[1,"W","Атака","","",[4]],[1,"W","Атака","","",[8]],[1,"W","Подача","Эйс","",[2]],[0,"F","Подача","Аут","",[2]],[0,"O","","Атака","Т",[]],[1,"W","Атака","Блок","Т/Ди",[3]],[1,"W","Атака","Блок","До",[8]],[0,"O","","Атака","Т",[]],[1,"W","Атака","Защита","Л",[7]],[1,"W","Подача","Прием","До",[3]],[1,"E","Сетка","Атака","Ди",[]],[1,"W","Атака","Защита","Ди",[8]],[1,"E","Аут","Атака","До",[]],[0,"F","Атака","Сетка","",[3]],[1,"W","Атака","Защита","Ди",[4]],[1,"W","Атака","Блок","Т/С",[4]],[1,"W","Подача","Прием","До",[7]],[0,"F","Защита","Атака","До",[7]],[1,"W","Атака","","",[2]],[1,"W","Блок","Атака","До",[2,8]],[0,"F","Подача","Аут","",[0]],[0,"F","Защита","Атака","До",[8]],[0,"O","Эйс","Подача","С",[]],[0,"F","Прием","Подача","С",[3]],[1,"W","Атака","Блок","Т/До",[2]],[1,"E","Аут","Атака","Ди",[]],[1,"W","Атака","","",[5]],[0,"F","Подача","Аут","",[4]],[1,"E","Аут","Атака","До",[]],[1,"W","Атака","","",[8]],[1,"E","Аут","Атака","До",[]],[0,"F","Подача","Аут","",[2]],[1,"E","Сетка","Подача","Т",[]]],[[1,"W","Атака","Блок","Т/С",[4]],[1,"E","Сетка","Блок","Т",[]],[1,"E","Аут","Атака","До",[]],[0,"F","Подача","Сетка","",[0]],[0,"F","Блок","Атака","До",[2,4]],[1,"E","Аут","Атака","До",[]],[1,"W","Подача","Прием","До",[4]],[1,"E","Аут","Атака","Т",[]],[1,"W","Подача","Прием","До",[4]],[1,"W","Подача","Прием","Л",[4]],[1,"E","Сетка","Атака","Ди",[]],[0,"F","Подача","Аут","",[4]],[1,"W","Атака","Блок","Т/Ди",[3]],[0,"F","Подача","Аут","",[2]],[1,"W","Атака","","",[3]],[1,"W","Атака","","",[3]],[0,"F","Подача","Аут","",[8]],[1,"W","Атака","Защита","Л",[7]],[0,"O","","Атака","До",[]],[0,"O","","Атака","До",[]],[0,"F","Атака","Аут","",[4]],[1,"W","Атака","Блок","Т/Ди",[4]],[0,"F","Блок","Атака","Т/Ди",[2,4]],[0,"O","","Атака","Т",[]],[1,"W","Атака","Блок","Т/До",[8]],[1,"E","Аут","Атака","До",[]],[0,"F","Блок","Атака","До",[2,8]],[1,"W","Атака","Защита","Л",[4]],[0,"F","Подача","Сетка","",[4]],[1,"W","Атака","Блок","Т/До",[8]],[1,"W","Атака","Блок","Т/Ди",[3]],[1,"W","Блок","Атака","Т",[7,8]],[0,"F","Подача","Аут","",[2]],[0,"F","Атака","Сетка","",[4]],[0,"F","Атака","Аут","",[7]],[1,"E","Аут","Подача","Т",[]],[0,"F","Защита","Атака","Ди",[5]],[1,"W","Атака","Защита","До",[3]],[0,"F","Защита","Атака","До",[3]],[0,"F","Защита","Атака","Ди",[3]],[1,"W","Атака","Защита","До",[7]],[1,"W","Атака","","",[4]],[1,"E","","Передача","С",[]]],[]]},{"dt":"10.10","opp":"H-Bang","tm":{"op":[4.0,11.0,5.0,0,0,20.0],"pt":[22,20,17,0,0,59],"er":[22,16,21,0,0,59],"uf":[11.0,4.0,9.0,0,0,24.0],"q":[25,25,25,0,0,75]},"pl":[[{"p":[8.0,23.0,5.0,0,36.0],"a":[0,0,0,0,1.0,0],"r":[0,0,0,0,0,0],"df":[0,0,1.0,0,0,1.0],"pd":[0,0,0,0],"b":[2.5,0,0,2.5],"s":[4.0,5.0,0,0,9.0]},{"p":[5.0,14.0,3.0,0,22.0],"a":[0,1.0,0,0,0,1.0],"r":[0,0,0,0,0,0],"df":[0,3.0,1.0,0,1.0,5.0],"pd":[1.0,0,0,1.0],"b":[1.0,0.5,0.5,2.0],"s":[5.0,1.0,0,0,6.0]},{"p":[9.0,20.0,10.0,0,39.0],"a":[1.0,0,0,0,0,1.0],"r":[0,0,0,0,0,0],"df":[0,1.0,1.0,0,0,2.0],"pd":[1.0,0,0,1.0],"b":[0.5,0.5,0.5,1.5],"s":[0,1.0,0,1.0,2.0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[22.0,57.0,18.0,0,97.0],"a":[1.0,1.0,0,0,1.0,2.0],"r":[0,0,0,0,0,0],"df":[0,4.0,3.0,0,1.0,8.0],"pd":[2.0,0,0,2.0],"b":[4.0,1.0,1.0,6.0],"s":[9.0,7.0,0,1.0,17.0]}],[{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]}],[{"p":[0,0,0,0,0],"a":[0,2.0,4.0,2.0,0,8.0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,2.0,0,2.0],"b":[0.5,1.0,1.0,2.5],"s":[2.0,1.0,0,1.0,4.0]},{"p":[0,1.0,0,0,1.0],"a":[0,0,1.0,0,2.0,1.0],"r":[0,0,0,0,0,0],"df":[0,1.0,0,0,1.0,2.0],"pd":[0,0,0,0],"b":[3.5,0.5,2.5,6.5],"s":[3.0,0,0,0,3.0]},{"p":[1.0,0,0,0,1.0],"a":[0,1.0,0,2.0,1.0,3.0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[1.0,0,0,1.0],"b":[2.0,0.5,2.0,4.5],"s":[4.0,2.0,1.0,0,7.0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[1.0,1.0,0,0,2.0],"a":[0,3.0,5.0,4.0,3.0,12.0],"r":[0,0,0,0,0,0],"df":[0,1.0,0,0,1.0,2.0],"pd":[1.0,2.0,0,3.0],"b":[6.0,2.0,5.5,13.5],"s":[9.0,3.0,1.0,1.0,14.0]}],[{"p":[2.0,0,1.0,0,3.0],"a":[6.0,0,2.0,2.0,0,10.0],"r":[2.0,2.0,2.0,0,0,6.0],"df":[0,2.0,1.0,0,0,3.0],"pd":[0,0,1.0,1.0],"b":[0,0,0.5,0.5],"s":[2.0,0,0,0,2.0]},{"p":[2.0,0,2.0,0,4.0],"a":[0,1.0,1.0,2.0,0,4.0],"r":[2.0,0,3.0,0,0,5.0],"df":[1.0,0,0,0,0,1.0],"pd":[1.0,0,0,1.0],"b":[0,0,0,0],"s":[2.0,0,0,0,2.0]},{"p":[0,0,0,0,0],"a":[3.0,1.0,0,1.0,1.0,5.0],"r":[3.0,2.0,1.0,0,1.0,7.0],"df":[1.0,0,1.0,0,0,2.0],"pd":[0,0,0,0],"b":[0.5,0.5,0.5,1.5],"s":[1.0,0,0,0,1.0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[4.0,0,3.0,0,7.0],"a":[9.0,2.0,3.0,5.0,1.0,19.0],"r":[7.0,4.0,6.0,0,1.0,18.0],"df":[2.0,2.0,2.0,0,0,6.0],"pd":[1.0,0,1.0,2.0],"b":[0.5,0.5,1.0,2.0],"s":[5.0,0,0,0,5.0]}],[{"p":[3.0,0,1.0,0,4.0],"a":[2.0,0,4.0,1.0,1.0,7.0],"r":[3.0,3.0,5.0,1.0,0,12.0],"df":[0,0,1.0,0,0,1.0],"pd":[0,0,0,0],"b":[0,0.5,1.0,1.5],"s":[2.0,0,0,1.0,3.0]},{"p":[1.0,0,0,0,1.0],"a":[2.0,0,0,1.0,4.0,3.0],"r":[0,5.0,1.0,0,1.0,7.0],"df":[0,1.0,1.0,1.0,0,3.0],"pd":[0,0,0,0],"b":[0,0,1.5,1.5],"s":[3.0,1.0,0,0,4.0]},{"p":[1.0,0,1.0,0,2.0],"a":[5.0,2.0,2.0,2.0,2.0,11.0],"r":[2.0,2.0,2.0,0,1.0,7.0],"df":[0,0,3.0,0,0,3.0],"pd":[0,0,0,0],"b":[0.5,0,1.5,2.0],"s":[0,1.0,0,0,1.0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[5.0,0,2.0,0,7.0],"a":[9.0,2.0,6.0,4.0,7.0,21.0],"r":[5.0,10.0,8.0,1.0,2.0,26.0],"df":[0,1.0,5.0,1.0,0,7.0],"pd":[0,0,0,0],"b":[0.5,0.5,4.0,5.0],"s":[5.0,2.0,0,1.0,8.0]}],[{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[5.0,0,0,0,1.0,6.0],"df":[1.0,0,1.0,0,3.0,5.0],"pd":[1.0,0,0,1.0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[1.0,0,1.0,0,2.0],"a":[0,0,0,0,0,0],"r":[2.0,0,1.0,2.0,0,5.0],"df":[0,1.0,0,2.0,3.0,6.0],"pd":[1.0,0,0,1.0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[1.0,0,1.0,0,2.0],"a":[0,0,0,1.0,0,1.0],"r":[1.0,5.0,3.0,0,0,9.0],"df":[1.0,2.0,1.0,2.0,0,6.0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[2.0,0,2.0,0,4.0],"a":[0,0,0,1.0,0,1.0],"r":[8.0,5.0,4.0,2.0,1.0,20.0],"df":[2.0,3.0,2.0,4.0,6.0,17.0],"pd":[2.0,0,0,2.0],"b":[0,0,0,0],"s":[0,0,0,0,0]}],[{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]}],[{"p":[1.0,0,1.0,0,2.0],"a":[1.0,0,1.0,2.0,0,4.0],"r":[0,0,0,0,0,0],"df":[0,1.0,1.0,0,0,2.0],"pd":[0,0,0,0],"b":[1.0,1.5,1.5,4.0],"s":[0,2.0,0,0,2.0]},{"p":[0,0,0,0,0],"a":[1.0,0,1.0,1.0,0,3.0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[1.0,0.5,0,1.5],"s":[3.0,0,0,0,3.0]},{"p":[0,2.0,0,0,2.0],"a":[2.0,2.0,1.0,1.0,0,6.0],"r":[0,0,0,0,0,0],"df":[1.0,0,0,0,0,1.0],"pd":[0,0,0,0],"b":[1.5,2.0,2.5,6.0],"s":[2.0,0,0,1.0,3.0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[1.0,2.0,1.0,0,4.0],"a":[4.0,2.0,3.0,4.0,0,13.0],"r":[0,0,0,0,0,0],"df":[1.0,1.0,1.0,0,0,3.0],"pd":[0,0,0,0],"b":[3.5,4.0,4.0,11.5],"s":[5.0,2.0,0,1.0,8.0]}],[{"p":[0,0,0,0,0],"a":[0,4.0,3.0,3.0,0,10.0],"r":[0,0,0,0,0,0],"df":[1.0,1.0,3.0,1.0,0,6.0],"pd":[0,0,0,0],"b":[0,1.0,0,1.0],"s":[1.0,0,0,1.0,2.0]},{"p":[1.0,0,1.0,0,2.0],"a":[1.0,4.0,4.0,1.0,1.0,10.0],"r":[0,0,0,0,0,0],"df":[1.0,1.0,0,1.0,0,3.0],"pd":[2.0,0,0,2.0],"b":[0.5,0.5,0.5,1.5],"s":[1.0,1.0,0,0,2.0]},{"p":[0,0,0,0,0],"a":[3.0,3.0,4.0,1.0,1.0,11.0],"r":[0,0,0,0,0,0],"df":[2.0,0,2.0,0,1.0,5.0],"pd":[5.0,0,0,5.0],"b":[1.0,0.5,0,1.5],"s":[0,1.0,0,1.0,2.0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[1.0,0,1.0,0,2.0],"a":[4.0,11.0,11.0,5.0,2.0,31.0],"r":[0,0,0,0,0,0],"df":[4.0,2.0,5.0,2.0,1.0,14.0],"pd":[7.0,0,0,7.0],"b":[1.5,2.0,0.5,4.0],"s":[2.0,2.0,0,2.0,6.0]}],[{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]}]],"rl":[[[1,"W","Атака","","",[2]],[1,"E","Аут","Атака","До",[]],[1,"W","Блок","Атака","Ди",[2,4]],[0,"F","Защита","Атака","Т",[5]],[1,"W","Атака","Защита","Т",[4]],[0,"O","","Атака","До",[]],[0,"F","Защита","Атака","До",[5]],[1,"W","Атака","","",[8]],[1,"W","Блок","Атака","До",[7,8]],[0,"O","","Атака","До",[]],[1,"W","Блок","Атака","Ди",[7]],[0,"F","Подача","Сетка","",[8]],[0,"F","Атака","Аут","",[8]],[0,"F","Атака","Аут","",[7]],[0,"F","Прием","Подача","До",[5]],[1,"W","Атака","","",[7]],[0,"F","Атака","Аут","",[7]],[0,"F","Подбор","","",[3]],[1,"W","Атака","Блок","Т",[8]],[0,"F","Блок","Атака","Ди",[2,4]],[0,"F","Атака","Аут","",[2]],[0,"F","Атака","Блок","Т/До",[8]],[1,"W","Атака","","",[4]],[1,"W","Блок","Атака","До",[8,2]],[1,"W","Атака","","",[4]],[1,"W","Атака","","",[2]],[0,"F","Блок","Атака","До",[2,4]],[1,"W","Атака","","",[2]],[0,"F","Подача","Аут","",[4]],[1,"W","Атака","","",[3]],[1,"E","Аут","Атака","До",[]],[0,"F","Подача","Сетка","",[2]],[1,"W","Атака","Блок","Т/С",[3]],[0,"F","Блок","Сетка","",[7]],[0,"F","Блок","Атака","Ди",[7,3]],[1,"E","Сетка","Подача","Ди",[]],[0,"F","Защита","Атака","До",[5]],[1,"W","Атака","Блок","Т/До",[8]],[0,"F","Атака","Сетка","",[2]],[0,"F","Атака","Аут","",[4]],[1,"W","Атака","","",[2]],[1,"E","Сетка","Атака","До",[]],[0,"F","Атака","Аут","",[8]],[1,"W","Атака","","",[4]],[0,"O","","Атака","До",[]],[0,"F","Атака","Блок","Т/Ди",[3]],[0,"F","Атака","Блок","Т/Ди",[3]]],[[1,"E","Сетка","Атака","До",[]],[0,"F","Защита","Атака","Т",[5]],[0,"F","Прием","Подача","До",[4]],[1,"E","Сетка","Подача","До",[]],[0,"O","","Атака","До",[]],[0,"F","Атака","Блок","Т/Ди",[3]],[1,"E","Аут","Подача","Т",[]],[0,"O","","Атака","Ди",[]],[1,"W","Атака","","",[7]],[0,"F","Защита","Атака","Т",[5]],[0,"O","Эйс","Подача","Ди",[]],[0,"O","Эйс","Подача","Ди",[]],[1,"W","Атака","Защита","Т",[8]],[0,"F","Атака","Аут","",[4]],[1,"W","Блок","Атака","До",[7,0]],[0,"O","","Атака","До",[]],[0,"O","Эйс","Подача","С",[]],[1,"W","Атака","","",[2]],[1,"W","Атака","Зашита","До",[8]],[0,"F","Блок","Атака","Т",[2,4]],[1,"E","Аут","Подача","До",[]],[0,"O","","Атака","Ди",[]],[0,"F","Атака","Сетка","",[3]],[1,"W","Атака","Защита","Т",[8]],[0,"F","Защита","Атака","До",[0]],[1,"E","Сетка","Подача","До",[]],[0,"F","Атака","Сетка","",[7]],[0,"O","","Атака","С",[]],[1,"E","Аут","Атака","До",[]],[0,"O","","Атака","До",[]],[1,"W","Атака","Защита","Т",[8]],[1,"E","Сетка","Атака","До",[]],[0,"F","Блок","Атака","Т",[2,4]],[0,"F","Блок","Атака","Ди",[2,4]],[0,"F","Блок","Атака","До",[2,0]],[1,"E","Сетка","Подача","С",[]],[1,"E","Сетка","Атака","До",[]],[1,"E","Сетка","Атака","До",[]],[0,"F","Зашита","Атака","До",[5]],[1,"E","Аут","Атака","До",[]],[1,"W","Блок","Атака","Ди",[2,8]],[0,"F","Блок","Атака","Ди",[2,8]],[1,"W","Атака","","",[3]],[0,"F","Защита","Атака","Ди",[2]],[0,"F","Атака","Аут","",[8]]],[[0,"F","Прием","Подача","С",[4]],[0,"F","Блок","Атака","Ди",[2,4]],[0,"F","Атака","Аут","",[8]],[1,"E","Сетка","Подача","С",[]],[1,"E","Аут","Атака","Т",[]],[0,"F","Артем(С)","Аут","",[-1]],[0,"F","Атака","Блок","Т/До",[4]],[0,"F","Блок","Атака","До",[2]],[1,"W","Атака","","",[8]],[0,"O","","Атака","Ди",[]],[0,"F","Атака","Блок","Т/Ди",[3]],[1,"E","Сетка","Подача","Т",[]],[1,"W","Атака","Защита","Т",[7]],[1,"W","Атака","Блок","Т/До",[8]],[1,"W","Блок","Атака","Т",[7]],[1,"W","Блок","Атака","До",[7,8]],[1,"W","Эйс","","",[2]],[1,"E","Аут","Атака","Ди",[]],[0,"F","Блок","Атака","Ди",[7,3]],[1,"W","Блок","Атака","Ди",[7,3]],[1,"W","Атака","Защита","Ди",[8]],[0,"F","Подача","Аут","",[8]],[0,"F","Атака","Блок","Т",[7]],[1,"W","Атака","","",[8]],[0,"F","Блок","Атака","Ди",[7]],[0,"F","Атака","Аут","",[4]],[0,"F","Защита","Атака","Т",[8]],[0,"F","Блок","Атака","До",[7,0]],[0,"F","Блок","Атака","Ди",[7,4]],[0,"F","Атака","Аут","",[5]],[1,"W","Атака","Блок","Т/С",[4]],[1,"W","Блок","Атака","До",[2,0]],[1,"W","Атака","","",[4]],[0,"F","Подача","Сетка","",[7]],[0,"F","Прием","Подача","С",[3]],[0,"O","","Атака","Т",[]],[1,"E","Сетка","Блок","Т/Ди",[]],[0,"F","Подача","Аут","",[0]],[0,"O","","Атака","Ди",[]],[0,"F","Атака","Аут","",[2]],[0,"F","Блок","Атака","Т",[2,4]]],[],[]]},{"dt":"17.10","opp":"Реал Мадрид","tm":{"op":[6.0,10.0,12.0,12.0,5.0,45.0],"pt":[16,20,25,24,11,96],"er":[16,22,15,18,11,82],"uf":[6.0,7.0,3.0,9.0,3.0,28.0],"q":[25,25,16,19,15,100]},"pl":[[{"p":[8.0,7.0,7.0,0,22.0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,1.0,1.0,1.0,1.0,4.0],"pd":[2.0,0,0,2.0],"b":[0,0,0,0],"s":[3.0,2.0,1.0,2.0,8.0]},{"p":[6.0,17.0,6.0,1.0,30.0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[1.0,0,0,1.0],"b":[0.5,0.5,0,1.0],"s":[2.0,1.0,1.0,0,4.0]},{"p":[5.0,16.0,6.0,1.0,28.0],"a":[1.0,0,0,0,0,1.0],"r":[0,0,0,0,0,0],"df":[0,1.0,1.0,0,0,2.0],"pd":[1.0,0,0,1.0],"b":[1.0,0,0.5,1.5],"s":[2.0,1.0,0,1.0,4.0]},{"p":[8.0,10.0,5.0,0,23.0],"a":[1.0,0,0,0,0,1.0],"r":[0,0,0,0,0,0],"df":[0,1.0,0,0,0,1.0],"pd":[1.0,0,0,1.0],"b":[1.0,0,0.5,1.5],"s":[2.0,2.0,0,1.0,5.0]},{"p":[7.0,7.0,2.0,0,16.0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,1.0,1.0],"b":[0,0,0.5,0.5],"s":[2.0,1.0,0,0,3.0]},{"p":[34.0,57.0,26.0,2.0,119.0],"a":[2.0,0,0,0,0,2.0],"r":[0,0,0,0,0,0],"df":[0,3.0,2.0,1.0,1.0,7.0],"pd":[5.0,0,1.0,6.0],"b":[2.5,0.5,1.5,4.5],"s":[11.0,7.0,2.0,4.0,24.0]}],[{"p":[1.0,0,0,0,1.0],"a":[0,0,0,0,0,0],"r":[0,0,1.0,1.0,0,2.0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[1.0,0,0,0,1.0],"a":[0,0,0,0,0,0],"r":[0,0,1.0,1.0,0,2.0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]}],[{"p":[1.0,0,0,0,1.0],"a":[0,1.0,0,0,0,1.0],"r":[0,0,0,0,0,0],"df":[0,0,0,1.0,0,1.0],"pd":[0,0,1.0,1.0],"b":[1.0,0.5,0.5,2.0],"s":[4.0,0,0,0,4.0]},{"p":[0,0,0,0,0],"a":[1.0,1.0,2.0,1.0,0,5.0],"r":[0,0,0,0,0,0],"df":[1.0,1.0,0,0,0,2.0],"pd":[0,0,0,0],"b":[1.5,1.0,2.0,4.5],"s":[1.0,2.0,0,0,3.0]},{"p":[0,1.0,0,0,1.0],"a":[0,0,2.0,0,0,2.0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[2.0,0,0.5,2.5],"s":[2.0,6.0,0,0,8.0]},{"p":[0,0,0,0,0],"a":[0,2.0,1.0,1.0,0,4.0],"r":[0,0,0,0,0,0],"df":[1.0,0,0,0,1.0,2.0],"pd":[0,0,0,0],"b":[1.0,0.5,2.0,3.5],"s":[4.0,1.0,0,1.0,6.0]},{"p":[0,0,0,0,0],"a":[1.0,0,1.0,0,0,2.0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0.5,0.5,0.5,1.5],"s":[2.0,0,0,0,2.0]},{"p":[1.0,1.0,0,0,2.0],"a":[2.0,4.0,6.0,2.0,0,14.0],"r":[0,0,0,0,0,0],"df":[2.0,1.0,0,1.0,1.0,5.0],"pd":[0,0,1.0,1.0],"b":[6.0,2.5,5.5,14.0],"s":[13.0,9.0,0,1.0,23.0]}],[{"p":[0,0,0,0,0],"a":[0,0,1.0,0,1.0,1.0],"r":[1.0,1.0,0,0,1.0,3.0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0.5,0,0.5],"s":[1.0,0,0,0,1.0]},{"p":[0,0,0,0,0],"a":[1.0,2.0,1.0,2.0,3.0,6.0],"r":[1.0,2.0,3.0,0,0,6.0],"df":[0,0,2.0,0,1.0,3.0],"pd":[3.0,0,1.0,4.0],"b":[2.0,0.5,0.5,3.0],"s":[1.0,1.0,0,0,2.0]},{"p":[0,0,0,0,0],"a":[3.0,2.0,1.0,0,1.0,6.0],"r":[0,2.0,1.0,0,0,3.0],"df":[0,0,0,0,1.0,1.0],"pd":[1.0,1.0,0,2.0],"b":[0.5,0,0,0.5],"s":[3.0,1.0,0,0,4.0]},{"p":[0,0,0,0,0],"a":[1.0,0,3.0,0,0,4.0],"r":[1.0,0,1.0,0,0,2.0],"df":[0,0,1.0,0,0,1.0],"pd":[1.0,0,0,1.0],"b":[0.5,0,0,0.5],"s":[0,1.0,0,2.0,3.0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[1.0,0,0,0,0,1.0],"df":[1.0,0,0,0,1.0,2.0],"pd":[0,0,1.0,1.0],"b":[0,0,0,0],"s":[0,1.0,0,0,1.0]},{"p":[0,0,0,0,0],"a":[5.0,4.0,6.0,2.0,5.0,17.0],"r":[4.0,5.0,5.0,0,1.0,15.0],"df":[1.0,0,3.0,0,3.0,7.0],"pd":[5.0,1.0,2.0,8.0],"b":[3.0,1.0,0.5,4.5],"s":[5.0,4.0,0,2.0,11.0]}],[{"p":[0,0,0,0,0],"a":[1.0,1.0,2.0,1.0,1.0,5.0],"r":[3.0,1.0,0,0,0,4.0],"df":[0,0,1.0,0,0,1.0],"pd":[0,0,0,0],"b":[2.0,0.5,0,2.5],"s":[1.0,0,0,0,1.0]},{"p":[0,0,0,0,0],"a":[1.0,2.0,0,0,1.0,3.0],"r":[2.0,2.0,2.0,0,0,6.0],"df":[2.0,0,0,0,0,2.0],"pd":[2.0,0,0,2.0],"b":[0,0.5,0,0.5],"s":[3.0,1.0,0,2.0,6.0]},{"p":[0,0,0,0,0],"a":[2.0,0,2.0,0,0,4.0],"r":[2.0,1.0,1.0,0,0,4.0],"df":[0,2.0,1.0,0,0,3.0],"pd":[3.0,0,1.0,4.0],"b":[0.5,0,1.5,2.0],"s":[0,2.0,0,1.0,3.0]},{"p":[0,0,0,0,0],"a":[1.0,1.0,2.0,1.0,1.0,5.0],"r":[3.0,1.0,2.0,0,0,6.0],"df":[0,0,0,0,0,0],"pd":[2.0,0,0,2.0],"b":[1.0,0,0,1.0],"s":[3.0,1.0,0,1.0,5.0]},{"p":[0,0,0,0,0],"a":[0,0,2.0,0,0,2.0],"r":[2.0,1.0,1.0,0,1.0,5.0],"df":[0,1.0,1.0,0,0,2.0],"pd":[0,0,0,0],"b":[1.0,0.5,0.5,2.0],"s":[2.0,0,0,1.0,3.0]},{"p":[0,0,0,0,0],"a":[5.0,4.0,8.0,2.0,3.0,19.0],"r":[12.0,6.0,6.0,0,1.0,25.0],"df":[2.0,3.0,3.0,0,0,8.0],"pd":[7.0,0,1.0,8.0],"b":[4.5,1.5,2.0,8.0],"s":[9.0,4.0,0,5.0,18.0]}],[{"p":[0,0,0,0,0],"a":[0,0,0,1.0,0,1.0],"r":[7.0,0,2.0,1.0,1.0,11.0],"df":[1.0,1.0,0,0,0,2.0],"pd":[0,0,1.0,1.0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[1.0,0,0,0,1.0],"a":[0,0,0,0,0,0],"r":[2.0,2.0,2.0,0,1.0,7.0],"df":[1.0,0,0,0,1.0,2.0],"pd":[1.0,1.0,1.0,3.0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[1.0,0,0,0,1.0],"a":[0,0,0,0,0,0],"r":[4.0,2.0,1.0,0,1.0,8.0],"df":[1.0,0,1.0,0,0,2.0],"pd":[0,0,1.0,1.0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[3.0,3.0,2.0,1.0,0,9.0],"df":[0,0,0,0,0,0],"pd":[1.0,0,0,1.0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[2.0,1.0,0,0,1.0,4.0],"df":[1.0,0,0,1.0,1.0,3.0],"pd":[1.0,1.0,0,2.0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[2.0,0,0,0,2.0],"a":[0,0,0,1.0,0,1.0],"r":[18.0,8.0,7.0,2.0,4.0,39.0],"df":[4.0,1.0,1.0,1.0,2.0,9.0],"pd":[3.0,2.0,3.0,8.0],"b":[0,0,0,0],"s":[0,0,0,0,0]}],[{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]}],[{"p":[0,1.0,0,0,1.0],"a":[1.0,1.0,0,0,0,2.0],"r":[0,0,0,1.0,0,1.0],"df":[0,1.0,0,0,0,1.0],"pd":[0,0,1.0,1.0],"b":[1.0,1.0,0,2.0],"s":[0,0,0,1.0,1.0]},{"p":[0,0,0,0,0],"a":[2.0,0,1.0,2.0,0,5.0],"r":[0,0,0,0,0,0],"df":[0,0,1.0,0,0,1.0],"pd":[1.0,0,0,1.0],"b":[2.0,0.5,1.5,4.0],"s":[1.0,1.0,0,1.0,3.0]},{"p":[1.0,2.0,1.0,0,4.0],"a":[0,1.0,3.0,0,0,4.0],"r":[0,0,0,0,0,0],"df":[0,2.0,0,0,1.0,3.0],"pd":[0,0,1.0,1.0],"b":[1.5,0,1.5,3.0],"s":[1.0,0,0,1.0,2.0]},{"p":[0,0,0,0,0],"a":[0,0,1.0,0,0,1.0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[1.0,0,1.0,2.0],"s":[1.0,1.0,0,1.0,3.0]},{"p":[0,0,0,0,0],"a":[2.0,0,1.0,0,0,3.0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[1.0,0,0.5,1.5],"s":[1.0,0,0,0,1.0]},{"p":[1.0,3.0,1.0,0,5.0],"a":[5.0,2.0,6.0,2.0,0,15.0],"r":[0,0,0,1.0,0,1.0],"df":[0,3.0,1.0,0,1.0,5.0],"pd":[1.0,0,2.0,3.0],"b":[6.5,1.5,4.5,12.5],"s":[4.0,2.0,0,4.0,10.0]}],[{"p":[0,1.0,0,0,1.0],"a":[2.0,0,3.0,3.0,1.0,8.0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,1.0,1.0],"pd":[1.0,0,0,1.0],"b":[0,0.5,0.5,1.0],"s":[0,1.0,0,0,1.0]},{"p":[1.0,0,0,0,1.0],"a":[5.0,2.0,2.0,1.0,1.0,10.0],"r":[0,0,0,0,0,0],"df":[2.0,0,0,0,0,2.0],"pd":[0,0,2.0,2.0],"b":[1.0,0,1.0,2.0],"s":[0,3.0,0,0,3.0]},{"p":[0,1.0,0,0,1.0],"a":[4.0,3.0,5.0,0,0,12.0],"r":[0,0,0,0,0,0],"df":[0,1.0,0,0,1.0,2.0],"pd":[2.0,1.0,0,3.0],"b":[1.5,0,0,1.5],"s":[1.0,1.0,0,0,2.0]},{"p":[0,1.0,0,0,1.0],"a":[0,1.0,3.0,3.0,1.0,7.0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[1.0,1.0,1.0,3.0],"b":[0.5,1.5,0.5,2.5],"s":[1.0,0,0,1.0,2.0]},{"p":[0,0,0,0,0],"a":[1.0,4.0,1.0,2.0,0,8.0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0.5,0,0,0.5],"s":[1.0,0,0,0,1.0]},{"p":[1.0,3.0,0,0,4.0],"a":[12.0,10.0,14.0,9.0,3.0,45.0],"r":[0,0,0,0,0,0],"df":[2.0,1.0,0,0,2.0,5.0],"pd":[4.0,2.0,3.0,9.0],"b":[3.5,2.0,2.0,7.5],"s":[3.0,5.0,0,1.0,9.0]}],[{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]},{"p":[0,0,0,0,0],"a":[0,0,0,0,0,0],"r":[0,0,0,0,0,0],"df":[0,0,0,0,0,0],"pd":[0,0,0,0],"b":[0,0,0,0],"s":[0,0,0,0,0]}]],"rl":[[[1,"W","Атака","Блок","Т/Ди",[4]],[1,"W","Блок","Атака","Т",[2,4]],[1,"W","Подача","Прием","До",[0]],[1,"W","Атака","Защита","До",[4]],[1,"E","Сетка","Атака","До",[]],[0,"F","Подача","Аут","",[0]],[0,"O","","Атака","До",[]],[1,"E","Сетка","Подача","До",[]],[0,"F","Защита","Атака","До",[0]],[1,"W","Атака","Блок","Т/До",[8]],[1,"W","Блок","Атака","Ди",[7,3]],[1,"E","Аут","Атака","Ди",[]],[1,"W","Блок","Атака","До",[7,8]],[0,"O","","Атака","До",[]],[0,"F","Атака","Блок","Т/До",[8]],[1,"W","Атака","","",[8]],[0,"O","","Атака","До",[]],[0,"F","Атака","","",[5]],[0,"F","Атака","Аут","",[8]],[0,"F","Защита","Атака","До",[8]],[1,"W","Атака","","",[3]],[0,"F","Подбор","","",[7]],[0,"O","","Атака","С",[]],[1,"E","Сетка","Подача","Т",[]],[0,"F","Подача","Сетка","",[7]],[0,"F","Подбор","","",[5]],[0,"O","Эйс","Подача","С",[]],[0,"F","Прием","Подача","С",[5]],[0,"F","Атака","Блок","Т/Ди",[4]],[0,"F","Прием","Подача","С",[3]],[0,"F","Подбор","","",[2]],[0,"F","Атака","Сетка","",[8]],[0,"O","","Атака","До",[]],[0,"O","Эйс","Подача","С",[]],[1,"W","Атака","","",[8]],[1,"E","Сетка","Атака","До",[]],[1,"E","Аут","Атака","Ди",[]],[0,"F","Подача","Сетка","",[0]],[0,"O","","Атака","До",[]],[0,"F","Блок","Атака","Ди",[2,8]]],[[0,"F","Блок","Атака","До",[2,8]],[1,"W","Атака","","",[2]],[0,"F","Подача","Сетка","",[4]],[0,"F","Атака","Блок","Т/Ди",[3]],[0,"F","Блок","Атака","Ди",[2,3]],[1,"E","Сетка","Подача","До",[]],[0,"F","Подбор","","",[8]],[1,"E","Аут","Атака","До",[]],[0,"F","Атака","Чужой мяч","",[7]],[1,"W","Блок","Атака","До",[7,0]],[0,"O","","Атака","До",[]],[1,"W","Атака","","",[8]],[1,"W","Блок","Атака","Ди",[2,4]],[0,"F","Блок","Атака","До",[2]],[0,"F","Предача","","",[0]],[1,"E","Сетка","Подача","Т",[]],[1,"W","Подача","Эйс","",[0]],[0,"F","Защита","Атака","До",[5]],[1,"E","","Подбор","До",[]],[0,"O","","Атака","До",[]],[1,"W","Блок","Атаак","Ди",[2,3]],[0,"F","Блок","Сетка","",[7,8]],[1,"E","Аут","Атака","Ди",[]],[1,"W","Атака","Блок","Т/Ди",[3]],[0,"F","Подбор","","",[5]],[0,"O","","Атака","Т",[]],[0,"F","Атака","Аут","",[8]],[1,"W","Атака","Защита","Л",[7]],[0,"F","Защита","Атака","До",[3]],[1,"E","Аут","Подача","До",[]],[0,"F","Подача","Сетка","",[7]],[1,"W","Атака","Защита","Т",[8]],[0,"F","Атака","Аут","",[3]],[0,"F","Подбор","","",[3]],[1,"E","Аут","Подача","С",[]],[1,"E","Аут","Атака","Ди",[]],[1,"W","Атака","","",[2]],[1,"E","Аут","Атака","Ди",[]],[0,"F","Подача","Аут","",[4]],[0,"F","Подбор","","",[8]],[0,"F","Прием","Подача","До",[5]],[0,"F","Атака","Блок","Т",[2]],[1,"E","Аут","Подача","До",[]],[0,"F","Блок","Чужой мяч","",[7]],[0,"F","Атака","Аут","",[7]]],[[1,"W","Атака","","",[2]],[0,"O","Заступ","Подбор","Ди",[]],[0,"F","Защита","Атака","Ди",[3]],[1,"W","Подбор","","",[5]],[1,"E","Сетка","Подача","До",[]],[0,"F","Подача","Сетка","",[4]],[1,"W","Атака","Блок","Т/Ди",[3]],[0,"F","Подбор","","",[7]],[1,"W","Атака","","",[8]],[0,"F","Блок","Атака","До",[7,0]],[0,"F","Прием","Подача","До",[5]],[1,"E","Сетка","Атака","До",[]],[1,"W","Атака","Защита","Ди",[8]],[1,"E","","Подбор","С",[]],[0,"F","Блок","Сетка","",[7,4]],[1,"W","Атака","","",[7]],[0,"F","Защита","Атака","До",[7]],[1,"W","Атака","Блок","Т/До",[8]],[0,"F","Подача","Аут","",[0]],[1,"E","Сетка","Подача","До",[]],[0,"F","Предача","Аут","",[0]],[1,"E","","Передача","С",[]],[0,"F","Подбор","","",[4]],[1,"W","Атака","Блок","Т",[7]],[1,"E","Аут","Атака","До",[]],[0,"F","Защита","Атака","До",[8]],[1,"E","Аут","Атака","До",[]],[0,"F","Блок","Атака","До",[7,4]],[1,"W","Атака","Блок","Т/С",[4]],[0,"F","Подача","Сетка","",[7]],[1,"E","Аут","Атака","До",[]],[0,"F","Блок","Атака","Ди",[2,4]],[1,"W","Атака","Защита","До",[4]],[0,"O","","Атака","До",[]],[1,"W","Атака","","",[2]],[1,"E","Заступ","Передача","С",[]],[1,"E","Сетка","Атака","До",[]],[1,"E","Аут","Атака","Ди",[]],[1,"W","Атака","","",[8]],[1,"W","Атака","Защита","До",[7]],[1,"W","Атака","Блок","До",[8]]],[[0,"F","Блок","Атака","До",[2,8]],[1,"W","Атака","Защита","Л",[4]],[0,"O","","Передача","С",[]],[1,"W","Атака","Блок","Т/Ди",[3]],[0,"O","","Атака","Ди",[]],[1,"W","Атака","Блок","Т/С",[3]],[1,"E","Сетка","Атака","До",[]],[1,"W","Блок","Атака","До",[8]],[1,"E","Аут","Атака","Ди",[]],[1,"E","Аут","Атака","До",[]],[0,"F","Подача","Аут","",[2]],[1,"W","Атака","Блок","Т/До",[8]],[0,"F","Подбор","","",[8]],[0,"F","Блок","Атака","С",[7]],[1,"W","Атака","","",[7]],[1,"E","","Подбор","Ди",[]],[0,"F","Подача","Сетка","",[3]],[1,"E","Сетка","Подача","До",[]],[0,"F","Блок","Атака","До",[2,0]],[0,"F","Атака","Аут","",[8]],[0,"F","Атака","Сетка","",[8]],[1,"E","Сетка","Подача","Т",[]],[1,"E","Сетка","Атака","До",[]],[1,"W","Подача","Прием","До",[0]],[1,"W","Блок","Атака","До",[2,8]],[0,"F","Блок","Атака","До",[2]],[1,"W","Атака","","",[4]],[1,"E","","Передача","С",[]],[1,"W","Атака","Защита","До",[3]],[0,"F","Подача","Аут","",[4]],[0,"F","Атака","Аут","",[4]],[0,"F","Атака","Аут","",[2]],[1,"E","Аут","Атака","Ди",[]],[0,"F","Защита","Атака","Ди",[2]],[1,"W","Атака","","",[8]],[0,"F","Подача","Сетка","",[8]],[0,"O","","Атака","До",[]],[0,"F","Атака","Аут","",[8]],[1,"W","Атака","","",[8]],[0,"F","Подача","Аут","",[3]],[1,"E","","Подбор","До",[]],[1,"W","Атака","","",[2]],[0,"F","Подача","Аут","",[7]],[1,"E","Аут","Подача","Т",[]]],[[1,"W","Атака","Защита","С",[8]],[1,"W","Блок","Атака","Ди",[2,4]],[0,"F","Подбор","","",[3]],[0,"F","Блок","Атака","До",[2,4]],[0,"F","Атака","Аут","",[8]],[0,"O","Эйс","Подача","До",[]],[0,"F","Прием","Подача","До",[4]],[1,"W","Атака","","",[4]],[0,"F","Защита","Атака","До",[5]],[1,"W","Атака","Защита","До",[2]],[0,"O","","Атака","До",[]],[1,"W","Атака","Защита","Л",[7]],[0,"F","Блок","Атака","До",[7,0]],[0,"F","Атака","Аут","",[8]],[1,"E","Аут","Подача","До",[]],[0,"F","Подбор","","",[0]],[1,"W","Атака","","",[4]],[0,"O","","Атака","До",[]],[1,"E","Сетка","Подача","С",[]],[0,"F","Защита","Атака","До",[3]],[0,"F","Прием","Подача","До",[5]],[1,"E","Сетка","Подача","До",[]],[1,"E","Аут","Атака","Ди",[]],[0,"F","Подача","Сетка","",[4]],[1,"E","Сетка","Блок","Т",[]],[0,"O","","Атака","До",[]]]]}]};
+
+function main(){
+const PLAYERS = DATA.players;
+const GAMES = DATA.games;
+
+/* ================== поддержка ================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const fmtNum = v => (Number.isFinite(v) ? (+v.toFixed(2)).toLocaleString('ru-RU') : '—');
+const fmtPct = v => (v == null ? '—' : (v * 100).toFixed(1).replace('.', ',') + '%');
+const effVal = v => (v == null ? -9 : v);
+const effColor = v => (v == null ? 'var(--dim)' : v > 0.25 ? 'var(--good)' : v > 0.08 ? 'var(--acc2)' : v >= 0 ? 'var(--warn)' : 'var(--bad)');
+const barPct = v => Math.max(0, Math.min(100, Math.abs(v) * 100));
+
+/* ================== конфиг навыков (Data Volley E%) ================== */
+const SK = {
+  pass  : {name:'Связка', arr:'p',  n:4, pos:[1],    neg:[2,3],    err:[3], top:1, topT:'передач с позитива',  c:'--pass'},
+  attack: {name:'Атака',  arr:'a',  n:5, pos:[2],    neg:[3],      err:[3], top:2, topT:'очков с атаки',       c:'--attack'},
+  recv  : {name:'Приём',  arr:'r',  n:5, pos:[1,2],  neg:[0,3,4],  err:[4], top:2, topT:'идеальных приёмов',   c:'--recv'},
+  def   : {name:'Защита', arr:'df', n:5, pos:[1,2],  neg:[0,3,4],  err:[4], top:2, topT:'идеальных защит',     c:'--def'},
+  pod   : {name:'Подбор', arr:'pd', n:3, pos:[1],    neg:[2],      err:[2], top:1, topT:'идеальных подборов',  c:'--pod'},
+  block : {name:'Блок',   arr:'b',  n:3, pos:[1],    neg:[2],      err:[2], top:1, topT:'блок-очков',          c:'--block'},
+  serve : {name:'Подача', arr:'s',  n:4, pos:[2],    neg:[3],      err:[3], top:2, topT:'эйсов',               c:'--serve'}
+};
+const SK_ORDER = ['pass','attack','recv','def','pod','block','serve'];
+
+/* ================== движок ================== */
+const add = (a, b) => a.map((v, i) => v + (b[i] || 0));
+const zero = () => ({p:[0,0,0,0,0], a:[0,0,0,0,0,0], r:[0,0,0,0,0,0], df:[0,0,0,0,0,0], pd:[0,0,0,0], b:[0,0,0,0], s:[0,0,0,0,0]});
+
+function skillStat(ct, key){
+  const c = SK[key], A = ct[c.arr];
+  const n = A[c.n] || 0;
+  const pos = c.pos.reduce((s,i)=>s+(A[i]||0),0);
+  const neg = c.neg.reduce((s,i)=>s+(A[i]||0),0);
+  const err = c.err.reduce((s,i)=>s+(A[i]||0),0);
+  const top = A[c.top] || 0;
+  return {n,pos,neg,err,top,
+    eff:     n ? (pos-neg)/n : null,
+    posPct:  n ? pos/n : null,
+    negPct:  n ? neg/n : null,
+    errPct:  n ? err/n : null,
+    topPct:  n ? top/n : null};
+}
+function compute(ct){
+  const sk = {}; let P = 0, N = 0, T = 0;
+  for(const k of SK_ORDER){ sk[k] = skillStat(ct,k); P += sk[k].pos; N += sk[k].neg; T += sk[k].n; }
+  const pts = (ct.a[2]||0) + (ct.b[1]||0) + (ct.s[2]||0);
+  const err = (ct.p[3]||0)+(ct.a[3]||0)+(ct.r[4]||0)+(ct.df[4]||0)+(ct.pd[2]||0)+(ct.b[2]||0)+(ct.s[3]||0);
+  return {sk, vol:T, eff:T?((P-N)/T):null, pos:P, neg:N, pts, err, util:pts-err};
+}
+const playerPlayed = (g, pi) => { const o = g.pl[pi][5]; return SK_ORDER.some(k => (o[SK[k].arr]||[]).reduce((s,v)=>s+v,0) > 0); };
+function mergeCounts(pi){
+  const ct = zero();
+  GAMES.forEach(g => { if(!playerPlayed(g,pi)) return; for(const k in ct) ct[k] = add(ct[k], g.pl[pi][5][k]||[]); });
+  return ct;
+}
+function teamMatchCounts(g){ const ct = zero(); g.pl.forEach(pg => { for(const k in ct) ct[k] = add(ct[k], pg[5][k]||[]); }); return ct; }
+function teamSeasonCounts(){ const ct = zero(); GAMES.forEach(g => { const t = teamMatchCounts(g); for(const k in ct) ct[k] = add(ct[k], t[k]); }); return ct; }
+
+/* собранные данные */
+const playedGames = GAMES.filter(g => g.pl.some((pg,pi) => playerPlayed(g,pi)));
+const playerSeason = PLAYERS.map((name,pi) => {
+  const games = GAMES.filter(g => playerPlayed(g,pi)).length;
+  const sets = GAMES.reduce((a,g)=>a+[0,1,2,3,4].filter(x=>(g.tm.pt[x]||0)>0 && SK_ORDER.some(k=>((g.pl[pi][x]||{})[SK[k].arr]||[]).reduce((u,v)=>u+v,0)>0)).length,0);
+  const c = compute(mergeCounts(pi));
+  return Object.assign({name, pi, games, sets, netSet: sets? c.util/sets : null, e100: c.vol? c.err/c.vol*100 : null}, c);
+});
+const teamSeason = compute(teamSeasonCounts());
+const matchTeam = GAMES.map(g => compute(teamMatchCounts(g)));
+const matchPlayers = GAMES.map(g => PLAYERS.map((name,pi) => Object.assign({name, pi, played:playerPlayed(g,pi)}, compute(g.pl[pi][5]))).filter(x=>x.vol>0));
+const gamesCount = playedGames.length;
+const playersCount = playerSeason.filter(p => p.vol > 0).length;
+const teamBenchPlayer = {name:'Команда', games:gamesCount, sk:teamSeason.sk, vol:teamSeason.vol};
+
+/* пороги надёжности */
+const MIN_VOL = 100, MIN_GAMES = 2, MIN_MATCH = 15, MIN_SKILL = 8;
+const effPool = playerSeason.filter(p => p.vol >= MIN_VOL && p.games >= MIN_GAMES);
+const lowData = p => p.vol < MIN_VOL || p.games < MIN_GAMES;
+const lowBadge = () => '<span class="mini-tag">мало данных</span>';
+
+/* ================== вкладки и навигация ================== */
+const TABS = [['overview','Обзор'],['ranking','Рейтинг игроков'],['matches','Матчи'],['players','Игроки'],['method','Методика']];
+const TIPS = {overview:'Сводка по сезону',ranking:'Рейтинги и выводы по игрокам',matches:'Разбор каждого матча',players:'Детальная карточка игрока',method:'Формулы и методика расчёта'};
+const state = {view:'overview', match:0, player:0, more:false, sort:{k:'netset', d:-1}, msort:{k:'netset', d:-1}, mFilter:{name:'', minVol:0}};
+
+function currentHash(){
+  const v = state.view;
+  const arg = v==='matches' ? state.match : v==='players' ? state.player : null;
+  return '#'+v + (arg!=null ? '/'+arg : '');
+}
+function commitHash(){ try{ history.replaceState(null, '', currentHash()); }catch(e){} location.hash = currentHash(); }
+function renderTabs(){
+  $('#tabs').innerHTML = TABS.map(([id,t]) => `<button class="tab ${state.view===id?'active':''}" data-v="${id}" role="tab" id="tab-${id}"
+    aria-controls="v-${id}" aria-selected="${state.view===id?'true':'false'}" title="${TIPS[id]}">${t}</button>`).join('');
+  $('#tabs').querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => navigate(b.dataset.v)));
+}
+function navigate(v, arg){
+  v = TABS.map(t=>t[0]).includes(v) ? v : 'overview';
+  if(v==='matches'){ const gi=parseInt(arg,10); if(Number.isFinite(gi) && GAMES[gi]) state.match=gi; }
+  if(v==='players'){ const pi=parseInt(arg,10); if(Number.isFinite(pi) && playerSeason[pi]) state.player=pi; }
+  setView(v);
+  commitHash();
+}
+function setView(v){
+  if(!TABS.map(t=>t[0]).includes(v)) v='overview';
+  state.view = v;
+  document.querySelectorAll('.view').forEach(s => s.classList.remove('active'));
+  $('#v-'+v).classList.add('active');
+  renderTabs();
+  const render = {overview:renderOverview, ranking:renderRanking, matches:renderMatches, players:renderPlayers, method:renderMethod}[v];
+  if(render) render();
+  try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){}
+}
+function applyHash(){
+  const h = (location.hash||'').replace(/^#/,'');
+  const i = h.indexOf('/');
+  const v = i>=0 ? h.slice(0,i) : h;
+  const arg = i>=0 ? h.slice(i+1) : undefined;
+  navigate(v, arg);
+}
+window.addEventListener('hashchange', applyHash);
+
+/* ================== тема ================== */
+const themeBtn = $('#theme-btn');
+function setTheme(t, persist){
+  document.documentElement.dataset.theme = t;
+  themeBtn.textContent = t==='dark' ? 'Тёмная' : 'Светлая';
+  try{ const m=document.querySelector('meta[name=theme-color]'); if(m) m.content = t==='dark'?'#0d1117':'#f2f4f9'; }catch(e){}
+  themeBtn.title = 'Тема: '+(t==='dark'?'тёмная':'светлая')+'. Нажмите для переключения';
+  if(persist){ try{ localStorage.setItem('skyline-theme', t); }catch(e){} }
+}
+themeBtn.addEventListener('click', () => {
+  const next = (document.documentElement.dataset.theme||'dark') === 'dark' ? 'light' : 'dark';
+  setTheme(next, true);
+});
+
+/* ================== экспорт CSV ================== */
+const exp = (fname, label) => `<button type="button" class="export-btn no-print" data-fname="${fname}" title="Скачать таблицу в CSV">⬇ ${label||'CSV'}</button>`;
+function exportTableCSV(tbl, fname){
+  try{
+    if(typeof URL==='undefined' || typeof URL.createObjectURL!=='function'){ console.warn('CSV: экспорт недоступен в этом окружении'); return; }
+    const rows = [...tbl.querySelectorAll('tr')].map(tr => [...tr.querySelectorAll('th,td')].map(c => {
+      const t = c.textContent.replace(/[▲▼]/g,'').replace(/\s+/g,' ').trim();
+      return '"'+t.replace(/"/g,'""')+'"';
+    }).join(',')).join('\r\n');
+    const blob = new Blob(['\ufeff'+rows], {type:'text/csv;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = fname;
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    try{ a.click(); }
+    catch(e){ console.warn('CSV: операция прервана браузером', e); }
+    finally{ a.remove(); }
+  }catch(e){ console.warn('CSV: не удалось сформировать файл', e); }
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('.export-btn');
+  if(!b || !b.dataset.fname) return;
+  const tbl = document.querySelector('table[data-fname="'+b.dataset.fname+'"]');
+  if(tbl) exportTableCSV(tbl, b.dataset.fname+'.csv');
+});
+
+/* ================== мини-блок навыка ================== */
+function skillBars(sk){
+  return SK_ORDER.map(k => {
+    const s = sk[k], c = SK[k];
+    const show = s.n > 0;
+    const eff = show ? s.eff : null;
+    const pos = show ? s.posPct : null;
+    const neg = show ? s.negPct : null;
+    const col = 'var('+c.c+')';
+    return `<div class="bar-row">
+      <div class="bl" style="color:${col}">${c.name}</div>
+      <div class="bar"><i style="width:${(show?barPct(eff):0)}%;background:${eff!=null&&eff<0?'var(--bad)':col}"></i></div>
+      <div class="bv" style="color:${effColor(eff)}">${fmtPct(eff)}</div>
+      <div class="bpos">${show?Math.round(pos*100)+'% позитив':''}</div>
+      <div class="bneg">${show?Math.round(neg*100)+'% негатив':''}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ================== источники ошибок ================== */
+function errorSources(sk){
+  const items = SK_ORDER.map(k=>{
+    const c=SK[k], s=sk[k];
+    return {k, name:c.name, color:'var('+c.c+')', err:s.err};
+  }).filter(x=>x.err>0).sort((a,b)=>b.err-a.err);
+  const total = items.reduce((s,x)=>s+x.err,0);
+  if(!total) return '<div class="empty" style="padding:16px">Прямых ошибок не зафиксировано</div>';
+  const segments = items.map(x=>`<i style="width:${(x.err/total*100).toFixed(1)}%;background:${x.color}"></i>`).join('');
+  const mx = items[0].err;
+  const rows = items.map((x,i)=>`<div class="bar-row" style="padding:6px 8px;border-radius:8px;${i===0?'background:rgba(248,113,113,.10);':''}">
+      <div class="bl" style="width:74px;color:${x.color};${i===0?'font-weight:800':''}">${x.name}</div>
+      <div class="bar"><i style="width:${(x.err/mx*100).toFixed(1)}%;background:${x.color}"></i></div>
+      <div class="bv" style="width:44px;${i===0?'font-weight:800;color:var(--bad)':''}">${fmtNum(x.err)}</div>
+      <div class="bpos" style="width:44px;min-width:0">${Math.round(x.err/total*100)}%</div>
+    </div>`).join('');
+  return `<div style="display:flex;gap:6px;align-items:baseline;margin-bottom:10px"><div class="mini">Прямые ошибки за сезон:</div><b style="color:var(--bad);font-size:16px">${fmtNum(total)}</b></div>
+    <div class="meter" style="height:14px">${segments}</div>
+    <div class="mini" style="margin-top:10px">Главная статья потерь: <b style="color:var(--bad)">${items[0].name}</b> (${Math.round(items[0].err/total*100)}% ошибок). Длина полосок — относительно главной статьи.</div>
+    <div style="margin-top:6px">${rows}</div>`;
+}
+
+/* ================== бенчмарки (проф. ориентиры) ================== */
+const BENCH_ORDER = ['recvTop','recvPos','kill','serveErr'];
+const BENCH = {
+  recvTop : {name:'Идеальный приём', dir:1, ok:0.30, great:0.35, desc:'доля идеальных приёмов (++), сравнение со средним по команде',          n:p=>p.sk.recv.n,  get:p=>p.sk.recv.topPct},
+  recvPos : {name:'Позитивный приём', dir:1, ok:0.50, great:0.60, desc:'приём, выведенный в атаку (+ и ++), сравнение со средним по команде',         n:p=>p.sk.recv.n,  get:p=>p.sk.recv.posPct},
+  kill    : {name:'Киллинг% атаки',   dir:1, ok:0.50, great:0.60, desc:'атаки, приносящие очко: сравнение со средним по команде',            n:p=>p.sk.attack.n,get:p=>p.sk.attack.topPct},
+  serveErr: {name:'Ошибки подачи',    dir:-1, ok:0.12, great:0.08, desc:'доля ошибок подачи, сравнение со средним по команде',                            n:p=>p.sk.serve.n, get:p=>p.sk.serve.errPct}
+};
+(function(){const t=teamSeason.sk,set=(k,base,d)=>{BENCH[k].ok=base;BENCH[k].great=base+d;};
+  set('recvTop',t.recv.topPct||0,.05);set('recvPos',t.recv.posPct||0,.05);set('kill',t.attack.topPct||0,.05);set('serveErr',t.serve.errPct||0,-.03);})();
+function benchVerdict(v,b){
+  if(v==null || !Number.isFinite(v)) return null;
+  if(b.dir<0) return v<=b.great ? 'ok' : (v<=b.ok ? 'mid' : 'bad');
+  return v>=b.great ? 'ok' : (v>=b.ok ? 'mid' : 'bad');
+}
+function benchTag(v,b){
+  if(benchVerdict(v,b)==null) return '';
+  const s=benchVerdict(v,b);
+  const cfg={ok:{t:b.dir<0?'заметно меньше среднего':'лучше среднего по команде',c:'var(--good)'},
+             mid:{t:b.dir<0?'около среднего':'около среднего',c:'var(--acc2)'},
+             bad:{t:b.dir<0?'ошибок больше среднего':'хуже среднего по команде',c:'var(--warn)'}}[s];
+  return `<span class="mini-tag" style="border-color:${cfg.c};color:${cfg.c}">${cfg.t}</span>`;
+}
+function benchLine(key,p){
+  const b=BENCH[key];
+  if(!b || (b.n(p)||0) < MIN_SKILL) return '';
+  const tag=benchTag(b.get(p),b);
+  return tag ? `<div class="skill-note" style="margin-top:5px;color:var(--muted)">к команде: ${tag}</div>` : '';
+}
+function benchList(pl){
+  const rows=BENCH_ORDER.map(k=>{
+    const b=BENCH[k];
+    if((b.n(pl)||0)<MIN_SKILL) return '';
+    const val=b.get(pl);
+    const norm = b.dir<0 ? `команда: ${fmtPct(b.ok)}` : `команда: ${fmtPct(b.ok)}`;
+    return `<div class="legend-item" style="align-items:center">
+      <div style="width:150px;flex:none;font-weight:700">${b.name}</div>
+      <div style="flex:1"><div class="mini" style="color:var(--dim)">${b.desc}</div></div>
+      <div style="flex:none;text-align:right"><b style="font-size:15px;font-variant-numeric:tabular-nums">${fmtPct(val)}</b>
+        <div class="mini" style="color:var(--dim)">${norm}</div></div>
+      <div style="flex:none;text-align:right">${benchTag(val,b)}</div>
+    </div>`;
+  }).join('');
+  if(!rows) return '<div class="empty" style="padding:16px">Недостаточно данных для оценки по ориентирам</div>';
+  return '<div>'+rows+'</div>';
+}
+
+
+/* ================== баланс очков, сверка, точки роста ================== */
+const wilsonLo=(k,n)=>{if(!n)return 0;const z=1.96,p=k/n,d=1+z*z/n;return (p+z*z/(2*n)-z*Math.sqrt(p*(1-p)/n+z*z/(4*n*n)))/d;};
+function dataChecks(){
+  const w=[];
+  GAMES.forEach(g=>{[0,1,2,3,4].forEach(s=>{const P=g.tm.pt[s]||0; if(!P) return;
+    const W=g.pl.reduce((a,pl)=>a+pl[s].a[2]+pl[s].b[1]+pl[s].s[2],0);
+    const E=g.pl.reduce((a,pl)=>a+pl[s].p[3]+pl[s].a[3]+pl[s].r[4]+pl[s].df[4]+pl[s].pd[2]+pl[s].b[2]+pl[s].s[3],0);
+    if(Math.abs(W+g.tm.op[s]-P)>0.01) w.push(`${g.dt} партия ${s+1}: очки ${P} ≠ чистые ${W} + ошибки соперника ${g.tm.op[s]}`);
+    if(Math.abs(E-g.tm.er[s])>0.01) w.push(`${g.dt} партия ${s+1}: ошибки игроков ${E} ≠ ошибки команды ${g.tm.er[s]}`);});});
+  return w;
+}
+function balanceCard(){
+  const rows=playedGames.map(g=>{const t=teamMatchCounts(g),W=t.a[2]+t.b[1]+t.s[2],O=g.tm.op[5],E=g.tm.er[5],Q=g.tm.q?g.tm.q[5]:null;
+    const ps=[0,1,2,3,4].filter(i=>(g.tm.pt[i]||0)>0), S=g.tm.q?ps.filter(i=>g.tm.pt[i]>g.tm.q[i]).length+':'+ps.filter(i=>g.tm.pt[i]<g.tm.q[i]).length:'';
+    return {S,dt:g.dt,opp:g.opp,W,O,E,Q,OW:Q==null?null:Q-E,D:Q==null?null:g.tm.pt[5]-Q};});
+  const sum=k=>rows.reduce((a,r)=>a+(r[k]||0),0), withQ=rows.filter(r=>r.Q!=null);
+  const share=withQ.length?Math.round(withQ.reduce((a,r)=>a+r.E,0)/withQ.reduce((a,r)=>a+r.Q,0)*100):null;
+  const td=(v,c)=>`<td style="${c?'color:'+c+';':''}font-variant-numeric:tabular-nums">${v==null?'—':fmtNum(v)}</td>`;
+  const line=(l,r,b)=>`<tr${b?' style="font-weight:800"':''}><td class="l">${l}</td>${td(r.W,'var(--good)')}${td(r.O,'var(--good)')}${td(r.E,'var(--bad)')}${td(r.OW,'var(--bad)')}${td(r.D,r.D>=0?'var(--good)':'var(--bad)')}</tr>`;
+  const all={W:sum('W'),O:sum('O'),E:sum('E'),OW:withQ.length?withQ.reduce((a,r)=>a+r.OW,0):null,D:withQ.length?withQ.reduce((a,r)=>a+r.D,0):null};
+  const chk=dataChecks();
+  return `<div class="section-title" style="margin-top:26px"><h2>Баланс очков</h2>${exp('results','CSV')}<div class="line"></div><div class="hint">разница = чистые очки + ошибки соперника − наши ошибки − чистые очки соперника</div></div>
+  <div class="card pad0"><div class="scroll-x"><table data-fname="results" aria-label="Баланс очков"><thead><tr><th class="l">Матч</th><th title="Атака++, блок+, эйсы">Наши чистые</th><th title="Ошибки соперника">+ Ош. соперника</th><th>− Наши ошибки</th><th title="Очки соперника без наших ошибок">− Чистые соперника</th><th>Разница</th></tr></thead>
+  <tbody>${rows.map(r=>line(`<b>${esc(r.dt)}</b> <span class="mini">vs ${esc(r.opp)}${r.S?' · сеты '+r.S:''}</span>`,r)).join('')}${line('Сезон',all,true)}</tbody></table></div>
+  <div class="mini" style="padding:12px 18px">${share==null?'':`Наши ошибки составляют ${share}% всех очков соперника — это главный рычаг. `}Сверка данных: ${chk.length?'<span style="color:var(--warn)">'+chk.map(esc).join('; ')+'</span>':'<span style="color:var(--good)">очки, ошибки и чистые очки сходятся во всех партиях</span>'}.</div></div>`;
+}
+const fold=(t,b,open)=>`<details class="fold"${open?' open':''}><summary>${t}</summary><div class="fold-body">${b}</div></details>`;
+const POINT_SK=['attack','block','serve'];
+function saldoBars(sk){
+  const it=SK_ORDER.map(k=>({k,name:SK[k].name,col:'var('+SK[k].c+')',v:(POINT_SK.includes(k)?sk[k].top:0)-sk[k].err})).filter(x=>x.v!==0||sk[x.k].n>0).sort((a,b)=>b.v-a.v);
+  const m=Math.max(1,...it.map(x=>Math.abs(x.v)));
+  return it.map(x=>`<div class="bar-row"><div class="bl" style="color:${x.col}">${x.name}</div><div class="bar"><i style="width:${(Math.abs(x.v)/m*100).toFixed(1)}%;background:${x.v>=0?'var(--good)':'var(--bad)'}"></i></div><div class="bv" style="width:52px;color:${x.v>=0?'var(--good)':'var(--bad)'};font-weight:800">${x.v>0?'+':''}${fmtNum(x.v)}</div></div>`).join('')
+   +'<div class="mini" style="margin-top:8px">Очки навыка (атака++, блок+, эйсы) минус его прямые ошибки.</div>';
+}
+function phaseNote(){
+  const gs=playedGames.filter(g=>g.rl); if(!gs.length) return '';
+  const all=gs.flatMap(g=>[0,1,2,3,4].flatMap(si=>setRallies(g,si))), A=phaseAgg(all), r=A.map(x=>x.n?x.F/x.n:0);
+  let rf=0,rn=0; gs.forEach(g=>[0,1,2,3,4].forEach(si=>findRuns(g,si,3).forEach(x=>{rn+=x.items.length;rf+=x.items.filter(y=>y.k==='F').length;})));
+  const hi=Math.max(...r),lo=Math.min(...r),w=r.indexOf(hi);
+  const t=hi-lo<0.08?`По ходу партии ошибаемся примерно одинаково (${Math.round(lo*100)}–${Math.round(hi*100)}% розыгрышей)`:`Чаще всего ошибаемся в фазе «${PH_NAMES[w].toLowerCase()}» (${Math.round(hi*100)}% розыгрышей)`;
+  return `<div class="note" style="margin-top:14px">${t}. В сериях соперника из 3+ очков подряд ${rn?Math.round(rf/rn*100):0}% очков — наши ошибки. Подробнее — в блоке «Ход партии и динамика команды».</div>`;
+}
+function playerGrowth(p){
+  const base=teamSeason.sk,A=[['serve','Подача','errPct','ошибки подачи'],['attack','Атака','errPct','ошибки атаки'],['recv','Приём','negPct','негативный приём'],['block','Блок','errPct','ошибки блока']],items=[];
+  A.forEach(([k,nm,r,lb])=>{const s=p.sk[k],n=s.n,b=base[k][r]; if(n<2*MIN_SKILL||b==null) return; const ex=n*(s[r]-b); if(ex<1) return; items.push({nm,lb,rate:s[r],b,ex,n,sure:wilsonLo(s[r]*n,n)>b});});
+  items.sort((x,y)=>y.ex-x.ex); if(!items.length) return '';
+  return `<div class="card" style="margin-top:16px"><h3 style="font-size:15px;margin-bottom:6px">Над чем поработать</h3>${items.slice(0,3).map(i=>`<div class="legend-item" style="align-items:center"><div style="flex:1"><b>${i.nm}</b>: ${i.lb} <b>${fmtPct(i.rate)}</b> <span class="mini">(команда ${fmtPct(i.b)}, действий ${fmtNum(i.n)})</span></div><div style="flex:none"><b>≈ +${fmtNum(i.ex)}</b> <span class="mini">лишних потерь</span></div><div style="flex:none"><span class="mini-tag" style="margin:0">${i.sure?'устойчиво':'возможно шум'}</span></div></div>`).join('')}</div>`;
+}
+/* ================== ход партии (лог розыгрышей) и динамика ================== */
+const PH_NAMES=['Старт','Середина','Концовка'];
+const EVS={'Подача':'Подача','Атака':'Атака','Прием':'Приём','Защита':'Защита','Блок':'Блок','Передача':'Др.','Подбор':'Др.'};
+const ESK=['Подача','Атака','Приём','Защита','Блок','Др.'];
+function setRallies(g,si){
+  const raw=(g.rl&&g.rl[si])||[]; const tgt=si===4?15:25; let a=0,b=0;
+  return raw.map((r,i)=>{ const m=Math.max(a,b), ph=m<tgt*0.4?0:(m<tgt*0.8?1:2);
+    const o={w:r[0],k:r[1],ev:r[2],oe:r[3],op:r[4],pis:r[5],a,b,ph,i}; if(r[0]) a++; else b++; o.a2=a; o.b2=b; return o; });
+}
+const evSk = r => EVS[r.ev]||'Др.';
+function phaseAgg(list){
+  const A=[0,1,2].map(()=>({n:0,w:0,F:0,E:0,O:0,W:0,sk:{}}));
+  list.forEach(r=>{const x=A[r.ph]; x.n++; if(r.w) x.w++; x[r.k]++; if(r.k==='F'){const k=evSk(r); x.sk[k]=(x.sk[k]||0)+1;}});
+  return A;
+}
+function phaseTable(A){
+  const worst = A.reduce((m,x,i)=> x.n && x.F/x.n > (A[m].n?A[m].F/A[m].n:-1) ? i : m, 0);
+  const rows=A.map((x,i)=>`<tr${i===worst&&x.n?' style="background:rgba(248,113,113,.08)"':''}><td class="l"><b>${PH_NAMES[i]}</b></td><td>${x.n}</td><td>${x.n?Math.round(x.w/x.n*100):0}%</td>
+    <td style="color:var(--bad);font-weight:700">${x.F} <span class="mini">(${x.n?Math.round(x.F/x.n*100):0}%)</span></td><td>${x.E} <span class="mini">(${x.n?Math.round(x.E/x.n*100):0}%)</span></td><td>${x.W}</td><td>${x.O}</td>
+    ${ESK.map(k=>`<td style="color:var(--dim)">${x.sk[k]||'·'}</td>`).join('')}</tr>`).join('');
+  return `<div class="scroll-x"><table class="ph" aria-label="Ошибки по ходу партии"><thead><tr><th class="l">Фаза</th><th title="Розыгрышей">Розыгр.</th><th title="Доля розыгрышей, выигранных нами">Мы выигр.</th><th title="Наши ошибки (доля от розыгрышей)">Наши ош.</th><th title="Ошибки соперника">Ош. соп.</th><th title="Наши чистые очки">Наши чист.</th><th title="Чистые очки соперника">Чист. соп.</th>${ESK.map(k=>`<th title="Наши ошибки: ${k}">${k}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function findRuns(g,si,min){
+  const list=setRallies(g,si), runs=[]; let cur=null;
+  list.forEach(r=>{ if(!r.w){ if(!cur) cur={si,a:r.a,b:r.b,items:[]}; cur.items.push(r); } else { if(cur&&cur.items.length>=min) runs.push(cur); cur=null; } });
+  if(cur&&cur.items.length>=min) runs.push(cur);
+  return runs;
+}
+function runText(r){
+  const F=r.items.filter(x=>x.k==='F'), O=r.items.length-F.length;
+  return `<b>Сет ${r.si+1}</b> · ${r.a}:${r.b} → ${r.a}:${r.b+r.items.length} · <b>${r.items.length} очк. подряд</b>: ${F.length} наших ошибок${F.length?' ('+F.map(evSk).join(', ')+')':''}${O?` + ${O} чист. очк. соперника`:''}`;
+}
+function spark(vals,labels,o){
+  const W=160,H=44,P=6, pts=vals.map((v,i)=>v==null?null:v), ok=pts.filter(v=>v!=null);
+  if(!ok.length) return '<div class="mini" style="padding:10px 0">нет данных</div>';
+  let lo=Math.min(...ok,o.ref!=null?o.ref:Infinity), hi=Math.max(...ok,o.ref!=null?o.ref:-Infinity); if(hi===lo){hi+=1;lo-=1;}
+  const x=i=>vals.length>1? P+i*(W-2*P)/(vals.length-1) : W/2, y=v=>H-P-(v-lo)/(hi-lo)*(H-2*P);
+  let path='',prev=false; pts.forEach((v,i)=>{ if(v==null){prev=false;return;} path+=(prev?'L':'M')+x(i).toFixed(1)+','+y(v).toFixed(1); prev=true; });
+  const dots=pts.map((v,i)=>v==null?'':`<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="3" style="fill:var(--acc)"><title>${esc(labels[i])}: ${o.fmt(v)}</title></circle>`).join('');
+  const ref=o.ref!=null?`<line x1="${P}" x2="${W-P}" y1="${y(o.ref).toFixed(1)}" y2="${y(o.ref).toFixed(1)}" style="stroke:var(--dim);stroke-dasharray:3 3"/>`:'';
+  const last=ok[ok.length-1], prevv=ok.length>1?ok[ok.length-2]:null, d=prevv==null?null:last-prevv;
+  const good=d==null?null:((o.dir>0)===(d>0)); 
+  const arrow=d==null||Math.abs(d)<1e-9?'':`<span style="color:${good?'var(--good)':'var(--bad)'}">${d>0?'▲':'▼'}</span>`;
+  return `<div class="card" style="padding:12px 14px"><div class="mini">${o.title}</div>
+    <div style="display:flex;align-items:baseline;gap:8px"><b style="font-size:18px">${o.fmt(last)}</b>${arrow}<span class="mini" style="margin-left:auto">${o.ref!=null?'сезон '+o.fmt(o.ref):''}</span></div>
+    <svg class="spk" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${o.title}">${ref}<path d="${path}" style="fill:none;stroke:var(--acc);stroke-width:2"/>${dots}</svg>
+    <div class="mini" style="display:flex;justify-content:space-between"><span>${esc(labels[0])}</span><span>${labels.length>1?esc(labels[labels.length-1]):''}</span></div></div>`;
+}
+function setChart(list){
+  const W=220,H=76,P=6; if(!list.length) return '';
+  const d=list.map(r=>r.a2-r.b2), m=Math.max(5,...d.map(Math.abs)), x=i=>P+i*(W-2*P)/Math.max(1,list.length-1), y=v=>H/2-v/m*(H/2-P);
+  const line=d.map((v,i)=>(i?'L':'M')+x(i).toFixed(1)+','+y(v).toFixed(1)).join('');
+  const marks=list.map((r,i)=>r.k==='F'?`<circle cx="${x(i).toFixed(1)}" cy="${y(d[i]).toFixed(1)}" r="2.6" style="fill:var(--bad)"><title>${r.a2}:${r.b2} · ошибка: ${esc(evSk(r))}</title></circle>`:'').join('');
+  return `<svg class="spk" style="height:86px" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Разница очков по ходу партии"><line x1="${P}" x2="${W-P}" y1="${H/2}" y2="${H/2}" style="stroke:var(--dim);stroke-dasharray:3 3"/><path d="${line}" style="fill:none;stroke:var(--acc2);stroke-width:2"/>${marks}</svg>`;
+}
+function runsCard(g){
+  if(!g.rl) return '';
+  const runs=[0,1,2,3,4].flatMap(si=>findRuns(g,si,3)).sort((x,y)=>y.items.length-x.items.length);
+  const F=runs.reduce((a,r)=>a+r.items.filter(x=>x.k==='F').length,0), N=runs.reduce((a,r)=>a+r.items.length,0);
+  return `<div class="card" style="margin-top:14px"><h3 style="font-size:15px;margin-bottom:4px">Серии соперника (3+ очка подряд)</h3><div class="mini" style="margin-bottom:6px">${runs.length?`${runs.length} серий, в ${F} из ${N} очков виноваты наши ошибки. Самые длинные:`:'Таких серий не было'}</div>${runs.slice(0,3).map(r=>`<div class="legend-item"><div class="ld" style="color:var(--txt)">${runText(r)}</div></div>`).join('')}</div>`;
+}
+function flowSection(g){
+  if(!g.rl) return '';
+  const all=[]; const cards=[0,1,2,3,4].map(si=>{ const l=setRallies(g,si); if(!l.length) return ''; all.push(...l);
+    const f=l.filter(r=>r.k==='F').length, fin=l[l.length-1], win=fin.a2>fin.b2;
+    return `<div class="card" style="padding:12px 14px"><div class="mini">Сет ${si+1} · <b style="color:${win?'var(--good)':'var(--bad)'}">${fin.a2}:${fin.b2}</b> · наших ошибок ${f}</div>${setChart(l)}</div>`; }).join('');
+  return fold('Ход партий: графики и фазы', `<div class="mini" style="margin-bottom:8px">Разница очков после каждого розыгрыша; красные точки — наши ошибки. Фазы: старт — до 40% очков партии, концовка — от 80%.</div><div class="grid cards">${cards}</div><div style="margin-top:14px">${phaseTable(phaseAgg(all))}</div>`);
+}
+function flowSeasonCard(){
+  const gs=playedGames.filter(g=>g.rl); if(!gs.length) return '';
+  const all=[]; let runs=0, runF=0, runN=0, won=[0,0,0].map(()=>({n:0,F:0}));
+  gs.forEach(g=>[0,1,2,3,4].forEach(si=>{ const l=setRallies(g,si); all.push(...l); findRuns(g,si,3).forEach(r=>{runs++; runN+=r.items.length; runF+=r.items.filter(x=>x.k==='F').length;}); }));
+  const A=phaseAgg(all);
+  const labels=gs.map(g=>g.dt);
+  const per=gs.map(g=>{ const l=[0,1,2,3,4].flatMap(si=>setRallies(g,si)); return {F:l.filter(r=>r.k==='F').length/l.length*100, D:g.tm.q?g.tm.pt[5]-g.tm.q[5]:null, S:[0,1,2,3,4].filter(si=>(g.tm.pt[si]||0)>0).length, W:l.filter(r=>r.k==='W').length}; });
+  const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
+  return fold('Ход партии и динамика команды', `<div class="mini" style="margin-bottom:8px">лог розыгрышей: ${all.length} розыгр. · серии соперника 3+ очка: ${runs}, из них наших ошибок ${runF} из ${runN}</div>
+    <div class="card pad0"><div style="padding:12px 18px 2px"><h3 style="font-size:15px">Где теряем очки по ходу партии</h3></div>${phaseTable(A)}</div>
+    <div class="grid cards" style="margin-top:14px">
+      ${spark(per.map(x=>x.D),labels,{title:'Разница очков в матче',fmt:v=>(v>0?'+':'')+fmtNum(v),dir:1,ref:mean(per.map(x=>x.D||0))})}
+      ${spark(per.map(x=>x.F),labels,{title:'Наши ошибки, % розыгрышей',fmt:v=>fmtNum(v)+'%',dir:-1,ref:mean(per.map(x=>x.F))})}
+      ${spark(per.map(x=>x.W/x.S),labels,{title:'Наши чистые очки за партию',fmt:v=>fmtNum(v),dir:1,ref:mean(per.map(x=>x.W/x.S))})}
+    </div>`);
+}
+function playerDyn(p){
+  const gs=GAMES.filter(g=>playerPlayed(g,p.pi)); if(gs.length<1) return '';
+  const lab=gs.map(g=>g.dt), cs=gs.map(g=>({c:compute(g.pl[p.pi][5]), n:[0,1,2,3,4].filter(i=>(g.tm.pt[i]||0)>0&&SK_ORDER.some(k=>((g.pl[p.pi][i]||{})[SK[k].arr]||[]).reduce((a,b)=>a+b,0)>0)).length}));
+  const sk=(k,f,min)=>cs.map(x=>x.c.sk[k].n>=min?x.c.sk[k][f]:null);
+  const mean=a=>{const z=a.filter(v=>v!=null);return z.length?z.reduce((x,y)=>x+y,0)/z.length:null;};
+  const pct=v=>fmtPct(v), series=[
+    {title:'±/партия (очки − ошибки)',v:cs.map(x=>x.n?x.c.util/x.n:null),fmt:fmtNum,dir:1,ref:p.netSet},
+    {title:'Ошибок на 100 действий',v:cs.map(x=>x.c.vol?x.c.err/x.c.vol*100:null),fmt:fmtNum,dir:-1,ref:p.e100},
+  ];
+  const cards=series.filter(x=>x.v.some(v=>v!=null)).map(x=>spark(x.v,lab,{title:x.title,fmt:x.fmt,dir:x.dir,ref:x.ref})).join('');
+  const my=[0,0,0]; let tot=0; GAMES.forEach(g=>{ if(!g.rl) return; [0,1,2,3,4].forEach(si=>setRallies(g,si).forEach(r=>{ if(r.k==='F'&&r.pis.includes(p.pi)){my[r.ph]++; tot++;} })); });
+  const phases=tot?`<div class="mini" style="margin-top:10px">Ошибки по ходу партии (по логу): ${PH_NAMES.map((n,i)=>`${n} <b>${my[i]}</b>`).join(' · ')} · всего ${tot}</div>`:'';
+  return `<div class="section-title"><h2>Динамика по матчам</h2><div class="line"></div><div class="hint">показатель в каждом сыгранном матче · пунктир — среднее за сезон · стрелка — изменение к прошлому матчу</div></div>
+    <div class="grid cards">${cards||'<div class="empty">Недостаточно данных</div>'}</div>`;
+}
+
+/* ================== Обзор ================== */
+function renderOverview(){
+  const bal = playedGames.filter(g=>g.tm.q).reduce((a,g)=>a+g.tm.pt[5]-g.tm.q[5],0);
+  const kpis = [
+    ['Матчей сыграно', gamesCount, 'в сезоне', '--acc'],
+    ['Заработанные очки', fmtNum(teamSeason.pts), 'атака++ + блок+ + эйсы', '--good'],
+    ['Наши ошибки', fmtNum(teamSeason.err), 'прямые потери за сезон', '--bad'],
+    ['Баланс очков', (bal>0?'+':'')+fmtNum(bal), 'наши очки − очки соперников', bal>=0?'--good':'--warn']
+  ];
+  const kpiHtml = kpis.map(([l,v,s,c]) => `<div class="card kpi"><div class="glow" style="background:var(${c})"></div><div class="k-label">${l}</div><div class="k-val">${v}</div><div class="k-sub">${s}</div></div>`).join('');
+
+  /* лидеры */
+  const leaders = buildLeaders();
+  const leaderCards = leaders.slice(0,4).map(L => `
+    <div class="card">
+      <div class="mini" style="text-transform:uppercase;letter-spacing:.05em;color:var(--muted)">${L.icon} ${L.title}</div>
+      <div style="display:flex;align-items:baseline;gap:10px;margin-top:8px">
+        <div style="font-size:16px;font-weight:800">${esc(L.name)}${L.low?lowBadge():''}</div>
+        <div style="margin-left:auto;font-size:20px;font-weight:800;color:${L.color}">${L.value}</div>
+      </div>
+      <div class="mini" style="margin-top:4px">${L.sub}</div>
+    </div>`).join('');
+
+  const mvp = leaders[0];
+  const mvpCard = mvp ? `<div class="card" style="margin-top:18px">
+    <div class="mvp">
+      <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#5eead433,#38bdf833);display:flex;align-items:center;justify-content:center;font-size:22px">★</div>
+      <div><div class="name">${esc(mvp.p.name)}</div>
+        <div class="meta">Лучший баланс очков · ${mvp.p.games} матч(а) · ${fmtNum(mvp.p.vol)} действ. · ${fmtNum(mvp.p.pts)} очков · ${fmtNum(mvp.p.err)} ошибок</div></div>
+      <div style="margin-left:auto;text-align:right"><div class="big" style="color:${mvp.p.util>=0?'var(--good)':'var(--warn)'}">${mvp.p.netSet==null?'—':fmtNum(mvp.p.netSet)}<small>очки − ошибки / партию</small></div></div>
+    </div></div>` : '';
+
+  const results = playedGames.map(g => `
+    <tr>
+      <td class="l"><b>${esc(g.dt)}</b> <span class="mini">vs ${esc(g.opp)}</span></td>
+      <td style="color:var(--good);font-weight:700">${fmtNum(g.tm.pt[5])}</td>
+      <td>${fmtNum(g.tm.op[5])}</td>
+      <td>${fmtNum(g.tm.er[5])}</td>
+      <td>${fmtNum(g.tm.uf.reduce((a,b)=>a+(b||0),0))}</td>
+    </tr>`).join('');
+
+  const maxPts = Math.max(1, ...playedGames.map(g=>g.tm.pt[5]||0));
+  const resBars = playedGames.map(g => {
+    const w = Math.round((g.tm.pt[5]||0)/maxPts*100);
+    return `<div class="bar-row"><div class="bl" style="width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(g.dt)} · ${esc(g.opp)}">${esc(g.dt)} · ${esc(g.opp)}</div><div class="bar"><i style="width:${w}%;background:var(--good)"></i></div><div class="bv" style="color:var(--good)">${fmtNum(g.tm.pt[5])}</div></div>`;
+  }).join('');
+
+  $('#v-overview').innerHTML = `
+    <div class="grid kpis">${kpiHtml}</div>
+    <div class="grid g2" style="margin-top:18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr))">
+      <div class="card"><h3 style="font-size:15px;margin-bottom:10px">Сальдо навыков</h3>${saldoBars(teamSeason.sk)}</div>
+      <div class="card"><h3 style="font-size:15px;margin-bottom:10px">Источники ошибок</h3>${errorSources(teamSeason.sk)}</div>
+    </div>
+    ${balanceCard()}
+    ${phaseNote()}
+    ${fold('Эффективность по группам действий', skillBars(teamSeason.sk))}
+    ${flowSeasonCard()}
+    ${fold('Лидеры сезона', `<div class="mini" style="margin-bottom:10px">среди игроков с не менее чем ${MIN_GAMES} матчами и ${MIN_VOL} действиями</div><div class="grid cards">${leaderCards}</div>`)}`;
+}
+
+function buildLeaders(){
+  const pool = playerSeason.filter(p => p.vol > 0);
+  const out = [];
+
+  const mvp = effPool.length ? [...effPool].sort((a,b)=>(b.netSet||0)-(a.netSet||0) || effVal(b.eff)-effVal(a.eff))[0] : [...pool].sort((a,b)=>b.util-a.util || effVal(b.eff)-effVal(a.eff))[0];
+  if(mvp) out.push({icon:'🏆', title:'Лучший баланс очков', name:mvp.name, value:(mvp.netSet==null?'—':fmtNum(mvp.netSet)), color:'var(--good)',
+    sub:`очки − ошибки на партию · всего ${fmtNum(mvp.pts)} − ${fmtNum(mvp.err)} за ${mvp.sets} парт.`, low:false, p:mvp});
+
+  const scorer = [...pool].sort((a,b)=>b.pts-a.pts)[0];
+  if(scorer) out.push({icon:'⚡', title:'Лучший бомбардир', name:scorer.name, value:fmtNum(scorer.pts), color:'var(--attack)',
+    sub:`очки: атака++ ${fmtNum(scorer.sk.attack.top)} · блок+ ${fmtNum(scorer.sk.block.top)} · эйсы ${fmtNum(scorer.sk.serve.top)}`, low:lowData(scorer)});
+
+  const attacker = [...pool].filter(p=>p.sk.attack.n>=20).sort((a,b)=>(b.sk.attack.topPct||0)-(a.sk.attack.topPct||0))[0] || [...pool].sort((a,b)=>(b.sk.attack.topPct||0)-(a.sk.attack.topPct||0))[0];
+  if(attacker) out.push({icon:'🎯', title:'Лучший завершающий', name:attacker.name, value:fmtPct(attacker.sk.attack.topPct), color:'var(--pass)',
+    sub:`киллинг ${fmtPct(attacker.sk.attack.topPct)} на ${fmtNum(attacker.sk.attack.n)} атак · эфф. ${fmtPct(attacker.sk.attack.eff)}`, low:lowData(attacker)});
+
+  const receiver = [...pool].filter(p=>p.sk.recv.n>=20).sort((a,b)=>(b.sk.recv.topPct||0)-(a.sk.recv.topPct||0))[0] || [...pool].sort((a,b)=>(b.sk.recv.topPct||0)-(a.sk.recv.topPct||0))[0];
+  if(receiver) out.push({icon:'🛡️', title:'Лучший на приёме', name:receiver.name, value:fmtPct(receiver.sk.recv.topPct), color:'var(--recv)',
+    sub:`идеальный приём ${fmtPct(receiver.sk.recv.topPct)} на ${fmtNum(receiver.sk.recv.n)} приёмов · эфф. ${fmtPct(receiver.sk.recv.eff)}`, low:lowData(receiver)});
+
+  const aces = [...pool].sort((a,b)=>b.sk.serve.top-a.sk.serve.top)[0];
+  if(aces) out.push({icon:'💨', title:'Лучший по эйсам', name:aces.name, value:fmtNum(aces.sk.serve.top), color:'var(--serve)',
+    sub:`эйсов · подач ${fmtNum(aces.sk.serve.n)} · эфф. ${fmtPct(aces.sk.serve.eff)}`, low:lowData(aces)});
+
+  const blocker = [...pool].sort((a,b)=>b.sk.block.top-a.sk.block.top)[0];
+  if(blocker) out.push({icon:'🧱', title:'Лучший блокирующий', name:blocker.name, value:fmtNum(blocker.sk.block.top), color:'var(--block)',
+    sub:`блок-очков · эфф. ${fmtPct(blocker.sk.block.eff)}`, low:lowData(blocker)});
+
+  const setter = [...pool].filter(p=>p.sk.pass.n>=50).sort((a,b)=>effVal(b.sk.pass.eff)-effVal(a.sk.pass.eff))[0];
+  if(setter) out.push({icon:'🎪', title:'Лучший связующий', name:setter.name, value:fmtPct(setter.sk.pass.eff), color:'var(--pass)',
+    sub:`эфф. передач · ${fmtNum(setter.sk.pass.n)} передач · ошибок паса ${fmtPct(setter.sk.pass.errPct)}`, low:lowData(setter)});
+
+  const useful = [...pool].sort((a,b)=>b.util-a.util)[0];
+  if(useful) out.push({icon:'➕', title:'Самый полезный', name:useful.name, value:fmtNum(useful.util), color:'var(--warn)',
+    sub:`очки − ошибки = ${fmtNum(useful.pts)} − ${fmtNum(useful.err)}`, low:lowData(useful)});
+
+  return out;
+}
+
+/* ================== Рейтинг ================== */
+const RCOLS = [
+  {k:'name', t:'Игрок', get:p=>p.name},
+  {k:'games',t:'М',  get:p=>p.games},
+  {k:'sets', t:'Парт.', get:p=>p.sets},
+  {k:'vol',  t:'Действ', get:p=>p.vol},
+  {k:'netset', t:'±/партия', get:p=>p.netSet==null?-99:p.netSet},
+  {k:'e100', t:'Ош/100', get:p=>p.e100==null?999:p.e100},
+  {k:'pts',  t:'Очки', get:p=>p.pts},
+  {k:'err',  t:'Ошибки', get:p=>p.err},
+  {k:'kill', t:'Киллинг%', get:p=>p.sk.attack.topPct==null?-9:p.sk.attack.topPct, effWrap:true},
+  {k:'aces', t:'Эйсы', get:p=>p.sk.serve.top},
+  {k:'rper', t:'Ид.приём%', get:p=>p.sk.recv.topPct==null?-9:p.sk.recv.topPct, effWrap:true},
+  {k:'reff', t:'Приём Эфф', get:p=>effVal(p.sk.recv.eff), effWrap:true},
+  {k:'blk',  t:'Блок+', get:p=>p.sk.block.top},
+  {k:'peff', t:'Связка Эфф', get:p=>effVal(p.sk.pass.eff), effWrap:true}
+];
+const RTIP = {
+  name:'Имя игрока', games:'Сыграно матчей из сезона', sets:'Сыграно партий', vol:'Всего действий по всем 7 группам',
+  eff:'Сводная эффективность по всем действиям. У связующего завышена из-за множества безошибочных передач — для сравнения игроков не использовать', util:'Полезность = очки − ошибки', netset:'Очки − ошибки на одну сыгранную партию (корректно сравнивать с учётом загрузки)', e100:'Прямых ошибок на 100 действий (меньше — лучше)',
+  pts:'Очки: атаки++ + блок+ + эйсы', err:'Прямые ошибки за сезон',
+  kill:'Киллинг%: доля атак, приносящих очко (Атака++ / все атаки)', aces:'Эйсы с подачи',
+  rper:'Идеальный приём%: Приём++ / все приёмы', reff:'Эффективность приёма',
+  blk:'Результативные блоки (блок-очки)', peff:'Эффективность связки (передачи)'
+};
+const MTIP = {name:'Имя игрока', dt:'Дата и соперник', vol:'Действий', eff:'Эффективность', util:'Очки − ошибки', pts:'Очки, заработанные игроком', err:'Прямые ошибки', kill:'Киллинг% атаки', aces:'Эйсы', rper:'Идеальный приём%', blk:'Блок+', games:'Сыграно матчей'};
+const BASIC=['name','sets','netset','e100','pts','err'];
+const colsFor=skipG=>state.more?RCOLS.filter(c=>!(skipG&&c.k==='games')):RCOLS.filter(c=>BASIC.includes(c.k));
+const moreBtn=()=>`<button id="btn-more" class="chip" type="button" style="padding:6px 12px;font-size:13px;white-space:nowrap">${state.more?'Меньше показателей':'Больше показателей'}</button>`;
+const defDir = k => (k==='name'||k==='games'||k==='sets'||k==='err'||k==='e100') ? 1 : -1;
+function ptCell(k,p,rank,o){
+  const cE = v => `<td style="color:${effColor(v)};font-weight:800">${fmtPct(v)}</td>`;
+  const cP = (v,n,bk) => { if(n<MIN_SKILL) return '<td style="color:var(--dim)">—</td>'; let t=cE(v);
+    if(bk && BENCH[bk]){ const bd=benchVerdict(BENCH[bk].get(p),BENCH[bk]);
+      if(bd==='ok') t=t.replace('</td>',' <span style="color:var(--good);font-size:11px">▲</span></td>');
+      else if(bd==='bad') t=t.replace('</td>',' <span style="color:var(--warn);font-size:11px">▼</span></td>'); }
+    return t; };
+  const lr = o.badge && o.low(p); const rc = lr?'':rank===1?'g1':rank===2?'g2':rank===3?'g3':'';
+  switch(k){
+    case 'name': return `<td class="l"${o.lowTitle&&o.low(p)?` title="${o.lowTitle}"`:''}><div style="display:flex;align-items:center;gap:10px"><span class="rankbadge ${rc}">${lr?'–':rank}</span><span class="name">${esc(p.name)}${o.badge&&o.low(p)?lowBadge():''}</span></div></td>`;
+    case 'games': return `<td>${p.games}</td>`;
+    case 'sets': return `<td>${p.sets}</td>`;
+    case 'vol': return `<td>${fmtNum(Math.round(p.vol))}</td>`;
+    case 'eff': return cE(p.eff);
+    case 'util': return `<td style="color:${p.util>=0?'var(--good)':'var(--bad)'};font-weight:700">${fmtNum(p.util)}</td>`;
+    case 'netset': return `<td style="color:${(p.netSet||0)>=0?'var(--good)':'var(--bad)'};font-weight:700">${p.netSet==null?'—':fmtNum(p.netSet)}</td>`;
+    case 'e100': return `<td>${p.e100==null?'—':fmtNum(p.e100)}</td>`;
+    case 'pts': return `<td style="color:var(--good);font-weight:700">${fmtNum(p.pts)}</td>`;
+    case 'err': return `<td style="color:var(--bad)">${fmtNum(p.err)}</td>`;
+    case 'kill': return cP(p.sk.attack.topPct,p.sk.attack.n,'kill');
+    case 'aces': return `<td>${fmtNum(p.sk.serve.top)}</td>`;
+    case 'rper': return cP(p.sk.recv.topPct,p.sk.recv.n,'recvTop');
+    case 'reff': return cP(p.sk.recv.eff,p.sk.recv.n);
+    case 'blk': return `<td>${fmtNum(p.sk.block.top)}</td>`;
+    case 'peff': return cP(p.sk.pass.eff,p.sk.pass.n);
+  } return '<td></td>';
+}
+function playerTable(rows, st, o){
+  const cols = o.cols;
+  const c0 = cols.find(x=>x.k===st.k) || cols.find(x=>x.k==='netset');
+  const sorted = rows.slice().sort((a,b)=>{ const va=c0.get(a), vb=c0.get(b);
+    return typeof va==='string' ? st.d*va.localeCompare(vb) : st.d*(va-vb); });
+  if(o.badge) sorted.sort((a,b)=>(o.low(a)?1:0)-(o.low(b)?1:0));
+  const head = cols.map(c => { const on = st.k===c.k;
+    return `<th class="${c.k==='name'?'l ':''}${on?'sorted':''}" data-k="${c.k}" tabindex="0" role="columnheader" scope="col" aria-sort="${on?(st.d<0?'descending':'ascending'):'none'}" aria-label="${c.t}: ${RTIP[c.k]}" title="${RTIP[c.k]}">${c.t}${on?`<span class="arr">${st.d<0?'▼':'▲'}</span>`:''}</th>`; }).join('');
+  const body = sorted.map((p,i)=>`<tr class="${o.low(p)&&!o.badge?'small-sample':''}">${cols.map(c=>ptCell(c.k,p,i+1,o)).join('')}</tr>`).join('');
+  return `<table data-fname="${o.fname}" aria-label="${o.aria}"><thead><tr>${head}</tr></thead><tbody>${body||`<tr><td colspan="${cols.length}" class="l" style="color:var(--dim);padding:18px">Нет игроков по фильтру</td></tr>`}</tbody></table>`;
+}
+function bindPlayerSort(rootSel, st, rerender){
+  const bm=$(rootSel).querySelector('#btn-more'); if(bm) bm.addEventListener('click',()=>{ state.more=!state.more; rerender(); });
+  $(rootSel).querySelectorAll('th[data-k]').forEach(th=>{
+    const go = () => { const k=th.dataset.k; if(st.k===k) st.d*=-1; else { st.k=k; st.d=defDir(k); } rerender(); };
+    th.addEventListener('click', go);
+    th.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } });
+  });
+}
+function renderRanking(){
+  const rows = playerSeason.filter(p=>p.vol>0);
+  const table = playerTable(rows, state.sort, {fname:'ranking', aria:'Рейтинг игроков сезона', cols:colsFor(false), low:lowData, badge:true});
+  const medals = buildLeaders().slice(0,3).map(L => `
+    <div class="card" style="padding:14px 16px">
+      <div class="mini">${L.icon} ${L.title}</div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px">
+        <b style="font-size:15px">${esc(L.name)}${L.low?lowBadge():''}</b>
+        <span style="margin-left:auto;font-weight:800;color:${L.color}">${L.value}</span>
+      </div>
+      <div class="mini" style="margin-top:3px">${L.sub}</div>
+    </div>`).join('');
+  $('#v-ranking').innerHTML = `
+    <div class="section-title"><h2>Рейтинг игроков сезона</h2>${exp('ranking','CSV')}${moreBtn()}<div class="line"></div><div class="hint">клик по столбцу — сортировка · ▲/▼ — лучше/хуже среднего по команде · «мало данных» = меньше ${MIN_GAMES} матч. или ${MIN_VOL} действ.</div></div>
+    <div class="note" style="margin-bottom:14px"><b>Рейтинг не учитывает роль игрока.</b> «Очки − ошибки» по определению выше у нападающих: связующий, либеро и игроки приёма и защиты приносят пользу качеством передач и приёма, а не очками. Это не «кто лучше», а баланс очков и ошибок — вклад по навыкам смотрите на странице игрока.</div>
+    <div class="card pad0"><div class="tbl-wrap scroll-x">${table}</div></div>`;
+  bindPlayerSort('#v-ranking', state.sort, renderRanking);
+}
+
+/* ================== Матчи ================== */
+function renderMatches(){
+  const idx = playedGames.indexOf(GAMES[state.match]);
+  const chips = playedGames.map((g,i)=>`<button class="chip ${i===idx?'active':''}" data-m="${i}"><span class="dot" style="background:var(--acc)"></span>${esc(g.dt)} · ${esc(g.opp)}</button>`).join('');
+  const g = GAMES[state.match];
+  if(!g || !playedGames.includes(g)){
+    $('#v-matches').innerHTML = `<div class="section-title"><h2>Матчи</h2><div class="line"></div><div class="chips">${chips}</div><div class="empty">Нет данных</div></div>`;
+    bindMatchChips(); return;
+  }
+  const tmc = teamMatchCounts(g);
+  const tm = compute(tmc);
+  const players = matchPlayers[state.match].map(p=>{
+    const n = [0,1,2,3,4].filter(i=>(g.tm.pt[i]||0)>0 && SK_ORDER.some(k=>((g.pl[p.pi][i]||{})[SK[k].arr]||[]).reduce((a,b)=>a+b,0)>0)).length;
+    return Object.assign({}, p, {games:1, sets:n, netSet:n?p.util/n:null, e100:p.vol?p.err/p.vol*100:null}); });
+  const mvp = players.filter(p=>p.vol>=MIN_MATCH).sort((a,b)=>b.util-a.util || effVal(b.eff)-effVal(a.eff))[0] || players[0];
+  const q = g.tm.q||[];
+  const played = [0,1,2,3,4].filter(i=>(g.tm.pt[i]||0)>0);
+  const sets = played.map(i=>{const p=g.tm.pt[i],o=q[i],has=o>0,w=has&&p>o;
+    return `<div class="setbox" style="${has?'border-color:'+(w?'var(--good)':'var(--bad)'):''}"><div class="sn">Сет ${i+1}${has?(w?' · победа':' · поражение'):''}</div><div class="sp">${fmtNum(p)}${has?':'+fmtNum(o):''}</div><div class="se">${has?'счёт':'наши очки'}</div></div>`;}).join('');
+  const setsW = played.filter(i=>q[i]>0&&g.tm.pt[i]>q[i]).length, setsL = played.filter(i=>q[i]>0&&g.tm.pt[i]<q[i]).length;
+
+  const f = state.mFilter;
+  const filtered = players;
+  const nameOpts = players.map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('');
+  const filterBar = `
+    <div class="filter-bar" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;padding:12px 14px">
+      <label style="display:flex;flex-direction:column;gap:4px"><span class="mini">Игрок</span>
+        <input id="mf-name" list="mf-names" placeholder="Все игроки" value="${esc(f.name)}" style="min-width:190px">
+        <datalist id="mf-names">${nameOpts}</datalist></label>
+      <label style="display:flex;flex-direction:column;gap:4px"><span class="mini">Мин. действий</span>
+        <input id="mf-vol" type="number" min="0" step="1" value="${f.minVol}" style="width:120px"></label>
+      <button id="mf-reset" type="button" class="chip" style="margin-left:auto">Сбросить</button>
+    </div>`;
+  const tableHtml = playerTable(filtered, state.msort, {fname:'match', aria:'Игроки матча', cols:colsFor(true), low:p=>p.vol<MIN_MATCH, lowTitle:'Малая выборка (< '+MIN_MATCH+' действий)'});
+  const mvpCard = mvp ? `<div class="card" style="padding:14px 16px;align-self:start">
+      <div class="mini">★ MVP матча — по полезности (мин. ${MIN_MATCH} действий)</div>
+      <div style="display:flex;align-items:baseline;gap:10px;margin-top:6px">
+        <b style="font-size:16px">${esc(mvp.name)}</b>
+        <span style="margin-left:auto;font-size:19px;font-weight:800;color:${mvp.util>=0?'var(--good)':'var(--warn)'}">${fmtNum(mvp.util)}</span>
+      </div>
+      <div class="mini" style="margin-top:3px">полезность = очки ${fmtNum(mvp.pts)} − ошибки ${fmtNum(mvp.err)} · ${fmtNum(mvp.vol)} действ. · эфф. ${fmtPct(mvp.eff)}</div></div>` : '';
+
+  $('#v-matches').innerHTML = `
+    <div class="section-title"><h2>Матчи</h2><div class="line"></div><div class="hint">${playedGames.length} сыгранных матчей</div></div>
+    <div class="chips">${chips}</div>
+    <div class="card">
+      <div class="hero">
+        <div>
+          <h3>${esc(g.dt)} · <span style="color:var(--acc)">vs ${esc(g.opp)}</span> ${q.length?`<span class="mini">· сеты ${setsW}:${setsL}</span>`:''}</h3>
+          <div class="score" style="margin-top:6px">Очки: <b style="color:var(--good)">${fmtNum(g.tm.pt[5])}</b> · ошибки соперника ${fmtNum(g.tm.op[5])} · наши ошибки ${fmtNum(g.tm.er[5])} (${fmtNum(g.tm.uf.reduce((a,b)=>a+(b||0),0))} невынужденных)</div>
+        </div>
+        <div style="margin-left:auto"><div class="score" style="margin-top:6px">Команда: полезность <b style="color:${tm.util>=0?'var(--good)':'var(--bad)'}">${fmtNum(tm.util)}</b></div></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">${sets}</div>
+      
+    </div>
+    ${runsCard(g)}<div class="section-title"><h2>Игроки матча</h2>${exp('match','CSV')}${moreBtn()}<div class="line"></div><div class="hint">клик по столбцу — сортировка · слабые строки приглушены (меньше ${MIN_MATCH} действий) · не учитывает роль игрока</div></div>
+    <div class="card pad0"><div class="scroll-x">${tableHtml}</div></div>
+    ${fold('Навыки команды в матче', skillBars(tm.sk))}
+    ${flowSection(g)}`;
+  bindMatchChips();
+  bindMatchFilters();
+}
+function bindMatchFilters(){
+  const root = $('#v-matches');
+  const nameEl = root.querySelector('#mf-name'), volEl = root.querySelector('#mf-vol'), reset = root.querySelector('#mf-reset');
+  if(nameEl) nameEl.addEventListener('input', e=>{ state.mFilter.name = e.target.value; rerenderKeepFocus('#mf-name'); });
+  if(volEl) volEl.addEventListener('change', e=>{ state.mFilter.minVol = Math.max(0, +e.target.value||0); renderMatches(); });
+  if(reset) reset.addEventListener('click', ()=>{ state.mFilter={name:'',minVol:0}; renderMatches(); });
+  bindPlayerSort('#v-matches', state.msort, renderMatches);
+}
+function rerenderKeepFocus(sel){
+  renderMatches();
+  const el = $(sel);
+  if(el){ el.focus(); const v=el.value; el.value=''; el.value=v; }
+}
+function bindMatchChips(){
+  $('#v-matches').querySelectorAll('.chip[data-m]').forEach(c=>c.addEventListener('click',()=>{
+    const idx = +c.dataset.m;
+    state.mFilter={name:'',minVol:0,util:'all'};
+    navigate('matches', GAMES.indexOf(playedGames[idx]));
+  }));
+}
+
+/* ================== Игроки ================== */
+function radarSVG(sk){
+  const S=230,CX=S/2,CY=S/2,MR=96;
+  const axes=[['attack','Атака'],['serve','Подача'],['recv','Приём'],['def','Защита'],['block','Блок'],['pass','Связка']];
+  const n=axes.length;
+  const pt=(i,r)=>[CX+Math.cos(Math.PI/2-i*2*Math.PI/n)*r, CY-Math.sin(Math.PI/2-i*2*Math.PI/n)*r];
+  let rings='',grid='',poly='',labels='',pts=[];
+  for(let g=1;g<=4;g++){
+    const r=MR*g/4;
+    rings+=`<circle cx="${CX}" cy="${CY}" r="${r}" style="stroke:var(--line);fill:none"/>`;
+  }
+  axes.forEach(([k,label],i)=>{
+    const a=sk[k];
+    const ok=a&&(a.eff!=null)&&(a.n>=MIN_SKILL);
+    const [x,y]=pt(i,MR);
+    grid+=`<line x1="${CX}" y1="${CY}" x2="${x}" y2="${y}" style="stroke:var(--line)"/>`;
+    labels+=`<text x="${x}" y="${y}" font-size="11" style="fill:var(--muted)" text-anchor="${Math.abs(x-CX)<2?'middle':x>CX?'start':'end'}" dominant-baseline="middle">${label}</text>`;
+    if(ok){ pts.push({v:Math.max(0.03,Math.min(1,(a.eff+1)/2)),i}); }
+  });
+  if(pts.length>=3){
+    const order=pts.slice().sort((a,b)=>a.i-b.i);
+    poly+=order.map((o,index)=>{const [x,y]=pt(o.i,MR*o.v);return (index?'L':'M')+x.toFixed(1)+','+y.toFixed(1)}).join('')+'Z';
+    pts.forEach(o=>{const [x,y]=pt(o.i,MR*o.v);poly+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" style="fill:var(--acc)"/>`;});
+    poly=`<path d="${poly}" style="fill:rgba(94,234,212,.16);stroke:var(--acc);stroke-width:2"/>`;
+  }
+  const note=pts.length<3?'<div style="color:var(--dim);font-size:11px;text-align:center;margin-top:4px">недостаточно данных для диаграммы (нужно 3+ навыка)</div>':'';
+  return `<div style="display:flex;flex-direction:column;align-items:center"><svg width="${S+70}" height="${S}" viewBox="-35 0 ${S+70} ${S}" style="max-width:240px" role="img" aria-label="Радар эффективности по навыкам: ${axes.map(([k,l])=>l+' '+fmtPct(sk[k].eff)).join(', ')}">${rings}${grid}${poly}${labels}</svg>${note}</div>`;
+}
+function skillDetailCard(key,p){
+  const c=SK[key],s=p.sk[key];
+  const col='var('+c.c+')';
+  const showDiscrete = s.n>0 ? s : null;
+  const lowTag = showDiscrete && s.n < MIN_SKILL ? '<span class="mini-tag" style="font-size:9px;margin-left:0">мало данных</span>' : '';
+  const topLine = showDiscrete ? `${c.topT}: <b style="color:${col}">${fmtNum(s.top)}</b>` : 'нет действий';
+  const segn = showDiscrete ? `<div class="meter" style="margin-top:8px"><i class="pos" style="width:${(s.posPct||0)*100}%"></i><i class="neu" style="width:${Math.max(0,1-(s.posPct||0)-(s.negPct||0))*100}%"></i><i class="neg" style="width:${(s.negPct||0)*100}%"></i></div>` : '';
+  const caps = showDiscrete ? `<div class="mini" style="display:flex;justify-content:space-between;margin-top:5px"><span>позитив ${Math.round((s.posPct||0)*100)}%</span><span style="color:var(--bad)">негатив ${Math.round((s.negPct||0)*100)}%</span></div>` : '';
+  const defs = showDiscrete ? `<div class="skill-note" style="margin-top:6px">n=${fmtNum(s.n)} · очк.действий ${fmtNum(s.top)} · прямых ошибок ${fmtNum(s.err)} · эфф. ${fmtPct(s.eff)}</div>` : '';
+  const benchMap={recv:['recvTop','recvPos'], attack:['kill'], serve:['serveErr']};
+  const benchLines=(benchMap[key]||[]).map(k=>benchLine(k,p)).join('');
+  return `<div class="card" style="padding:14px 16px">
+    <div class="mini" style="text-transform:uppercase;letter-spacing:.05em;color:${col}">${c.name} ${lowTag}</div>
+    <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px">
+      <span style="font-size:19px;font-weight:800;color:${effColor(s.eff)}">${fmtPct(s.eff)}</span>
+      <span class="mini" style="margin-left:auto">${topLine}</span>
+    </div>
+    ${segn}${caps}${defs}${benchLines}
+  </div>`;
+}
+function renderPlayers(){
+  const chips = playerSeason.map((p,i)=>`<button class="chip ${state.player===i?'active':''}" data-p="${i}"><span class="dot" style="background:${p.vol>0?'var(--acc)':'var(--dim)'}"></span>${esc(p.name)}</button>`).join('');
+  const p = playerSeason[state.player];
+  if(!p || p.vol===0){
+    $('#v-players').innerHTML = `<div class="section-title"><h2>Игроки</h2><div class="line"></div><div class="chips">${chips}</div><div class="empty">Игрок ещё не играл в этом сезоне</div></div>`;
+    bindPlayerChips(); return;
+  }
+  const statInRow = (v,key) => `<div><div class="k-label">${key}</div><div class="k-val" style="font-size:18px">${v}</div></div>`;
+  const matchRows = GAMES.map((g,gi)=>{
+    if(!playerPlayed(g,p.pi)) return '';
+    const st=compute(g.pl[p.pi][5]);
+    return `<tr>
+      <td class="l"><b>${esc(g.dt)}</b> <span class="mini">vs ${esc(g.opp)}</span></td>
+      <td>${fmtNum(st.vol)}</td>
+      <td>${fmtNum(st.pts)}</td>
+      <td>${fmtNum(st.err)}</td>
+      <td style="color:${st.util>=0?'var(--good)':'var(--bad)'};font-weight:700">${fmtNum(st.util)}</td>
+    </tr>`;
+  }).join('');
+
+  $('#v-players').innerHTML = `
+    <div class="section-title"><h2>Игроки</h2><div class="line"></div><div class="hint">выберите игрока</div></div>
+    <div class="chips">${chips}</div>
+    <div class="card">
+      <div class="hero">
+        <div>
+          <h3 style="font-size:20px">${esc(p.name)}${lowData(p)?lowBadge():''}</h3>
+          <div class="mini" style="margin-top:3px">${p.games} матч(а) · ${fmtNum(Math.round(p.vol))} действий за сезон</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <div class="big" style="color:${(p.netSet||0)>=0?'var(--good)':'var(--bad)'};font-size:30px">${p.netSet==null?'—':fmtNum(p.netSet)}<small>очки − ошибки за партию</small></div>
+        </div>
+      </div>
+      <div class="grid kpis" style="grid-template-columns:repeat(auto-fit,minmax(110px,1fr));margin-top:16px">
+        ${statInRow(p.sets,'Партий')}
+        ${statInRow(fmtNum(p.pts),'Очки')}
+        ${statInRow(fmtNum(p.err),'Ошибки')}
+        ${statInRow(p.netSet==null?'—':fmtNum(p.netSet),'±/партия')}
+        ${statInRow(p.e100==null?'—':fmtNum(p.e100),'Ош/100 действ.')}
+      </div>
+    </div>
+    ${playerGrowth(p)}
+    <div class="grid g2" style="margin-top:16px;align-items:start">
+      <div class="card"><h3 style="font-size:15px;margin-bottom:10px">Источники ошибок</h3>${errorSources(p.sk)}</div>
+      <div>${['attack','recv','serve','block'].filter(k=>SK_ORDER.includes(k)).map(k=>skillDetailCard(k,p)).join('')}</div>
+    </div>
+    ${fold('Другие навыки', `<div class="grid cards">${SK_ORDER.filter(k=>!['attack','recv','serve','block'].includes(k)).map(k=>skillDetailCard(k,p)).join('')}</div>`)}
+    ${fold('Сравнение со средним по команде', benchList(p))}
+    ${playerDyn(p)}<div class="section-title"><h2>Матчи игрока</h2>${exp('player','CSV')}<div class="line"></div><div class="hint">показатели по каждому матчу отдельно</div></div>
+    <div class="card pad0"><div class="scroll-x"><table data-fname="player" aria-label="Матчи игрока">
+      <thead><tr><th class="l" scope="col" title="Дата и соперник">Матч</th><th scope="col" title="${MTIP.vol}">Действ</th><th scope="col" title="${MTIP.pts}">Очки</th><th scope="col" title="${MTIP.err}">Ошибки</th><th scope="col" title="Очки минус ошибки">Очки − ош.</th></tr></thead>
+      <tbody>${matchRows||'<tr><td colspan="5">Нет данных</td></tr>'}</tbody>
+    </table></div></div>`;
+  bindPlayerChips();
+}
+function bindPlayerChips(){
+  $('#v-players').querySelectorAll('.chip[data-p]').forEach(c=>c.addEventListener('click',()=>navigate('players', +c.dataset.p)));
+}
+
+/* ================== Методика ================== */
+const METHOD_SKILLS = [
+  ['Связка','--pass','Передачи','Позитив: передача с положительного приёма/защиты (ассист). Негатив: плохая передача + ошибка паса.','(Связка+ − (Связка− + Ошиб.)) / Связка-все'],
+  ['Атака','--attack','Атаки','Позитив: атака, приносящая очко (килл). Негатив: ошибка атаки. Сохранение мяча и «обычные» атаки нейтральны.','(Атака++ − Ошиб.атаки) / Атаки-все'],
+  ['Приём','--recv','Приём подачи','Позитив: идеальный (++) и хороший (+). Негатив: приём «−», перелёт «/» и прямая ошибка.','((++ + +) − (− + / + ошиб.)) / Приём-все'],
+  ['Защита','--def','Защита','Позитив: идеальная (++) и хорошая (+). Негатив: «−», перелёт «/», ошибка.','((++ + +) − (− + / + ошиб.)) / Защита-все'],
+  ['Подбор','--pod','Подбор','Позитив: подбор к связующему в зоне атаки. Негатив: ошибка подбора.','(Подбор+ − Ошиб.) / Подбор-все'],
+  ['Блок','--block','Блок','Позитив: блок-очко. Негатив: ошибка. Смягчающий «Блок» нейтрален.','(Блок+ − Ошиб.) / Блок-все'],
+  ['Подача','--serve','Подача','Позитив: эйс. Негатив: ошибка. Это E% подачи.','(Эйсы − Ошиб.) / Подача-все']
+];
+function renderMethodFull(){
+  $('#v-method').innerHTML = `
+  <div class="method">
+    <div class="section-title"><h2>Методика и данные</h2><div class="line"></div><div class="hint">как считались показатели, откуда берутся данные и насколько им можно доверять</div></div>
+
+    <div class="chips m-toc" id="m-toc">
+      <button class="chip" data-jump="m-src">Источник данных</button>
+      <button class="chip" data-jump="m-principle">Принцип</button>
+      <button class="chip" data-jump="m-skills">Формулы групп</button>
+      <button class="chip" data-jump="m-derived">Производные</button>
+      <button class="chip" data-jump="m-reliab">Надёжность</button>
+      <button class="chip" data-jump="m-diff">Отличия от книги</button>
+      <button class="chip" data-jump="m-note">Достоверность</button>
+    </div>
+
+    <div class="grid m2">
+      <div class="card" id="m-src">
+        <h3 style="margin-top:0">Источник данных</h3>
+        <p>Основа — файл <b>«SKYLINE Statistics Autumn 2026.xlsx»</b> (сезон осень 2026): по каждому игроку и сету записаны все действия, это «бухгалтерия» матчей. Сыграно матчей: ${gamesCount} (${playedGames.map(g=>esc(g.dt)+' vs '+esc(g.opp)).join('; ')}).</p>
+        <div class="kv">
+          <div class="kv-i"><span class="kv-k">Из книги берём</span><span class="kv-v">только фактические подсчёты действий (колонки партий и «Итог») и результаты матчей — очки, ошибки команды и соперника.</span></div>
+          <div class="kv-i"><span class="kv-k">НЕ переносим</span><span class="kv-v">ни одну готовую «Общая эффективность» или формулу Excel — все проценты пересчитываются здесь, на странице, по принципам волейбольной статистики.</span></div>
+          <div class="kv-i"><span class="kv-k">Кто классифицирует</span><span class="kv-v">статистик ведёт подсчёт во время матча по буквенным определениям («Связка+», «Приём++», «Атака++», «Ошибка» и т.д.).</span></div>
+          <div class="kv-i"><span class="kv-k">Где хранятся</span><span class="kv-v">внутри этого файла в блоке <code>const DATA</code>. Сервер не участвует: всё считается локально в браузере при открытии.</span></div>
+          <div class="kv-i"><span class="kv-k">Как обновлять</span><span class="kv-v">запустить скрипт <code>update_stats.py</code> (книга.xlsx + эта страница): он пересоберёт блок DATA, сверит очки и ошибки и покажет предупреждения; всё остальное пересчитается автоматически.</span></div>
+        </div>
+      </div>
+
+      <div class="card" id="m-principle">
+        <h3 style="margin-top:0">Основной принцип</h3>
+        <p>Каждое действие игрока имеет качество: очко, хорошее, нейтральное, ошибка. Эффективность показывает баланс «пользы» и «вреда» в расчёте на одно действие:</p>
+        <div class="formula">Эффективность = (позитив − негатив) / всего действий</div>
+        <ul class="m-legend">
+          <li><span class="dp pos"></span><b>Позитив</b> — очко или явное преимущество: киллы, эйсы, блок-очки, идеальные приёмы и передачи.</li>
+          <li><span class="dp neg"></span><b>Негатив</b> — прямые ошибки и действия, отдающие инициативу.</li>
+          <li><span class="dp nul"></span><b>Нейтрально</b> — мяч просто остаётся в игре: в числитель не входит, но в знаменатель входит.</li>
+        </ul>
+        <p class="mini" style="margin-top:4px">Формулы открыты и воспроизводимы.</p>
+      </div>
+    </div>
+
+    <div class="card" id="m-skills">
+      <h3 style="margin-top:0">Семь групп действий и их формулы</h3>
+      <div class="ms">
+        ${METHOD_SKILLS.map(([n,cc,sub,desc,f])=>`<div class="ms-i">
+          <div class="msbar"><span class="msn"><span class="sk-dot" style="background:var(${cc})"></span>${n}</span><span class="mini">${sub}</span></div>
+          <div class="msd">${desc}</div>
+          <div class="formula">${f}</div>
+        </div>`).join('')}
+      </div>
+      <p class="mini" style="margin-top:10px">Ключевая деталь: «Связка −» и перелёты «/» приравнены к негативу, поэтому «недоведённый» мяч честно снижает эффективность группы — так же, как в классическом приёме.</p>
+    </div>
+
+    <div class="grid m2">
+      <div class="card pad0" id="m-derived" style="overflow:hidden">
+        <div style="padding:16px 18px 4px"><h3 style="margin-top:0">Производные показатели</h3></div>
+        <div class="scroll-x"><table class="mt">
+          <thead><tr><th class="l">Показатель</th><th class="l">Формула</th><th class="l">Смысл</th></tr></thead>
+          <tbody>
+            <tr><td class="l">Очки</td><td class="l">Атака++ + Блок+ + Эйсы</td><td class="l">сколько очков игрок принёс команде</td></tr>
+            <tr><td class="l">Ошибки</td><td class="l">сумма прямых ошибок по всем 7 группам</td><td class="l">сколько «подарил» сопернику</td></tr>
+            <tr><td class="l">Полезность</td><td class="l">Очки − Ошибки</td><td class="l">чистый «вклад в счёт» матча</td></tr>
+            <tr><td class="l">Киллинг%</td><td class="l">Атака++ / все атаки</td><td class="l">доля атак, приносящих очко</td></tr>
+            <tr><td class="l">Идеальный приём%</td><td class="l">Приём++ / все приёмы</td><td class="l">доля «чистых» приёмов подачи</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="card" id="m-index">
+        <h3 style="margin-top:0">Сводная эффективность (справочно)</h3>
+        <div class="formula">Индекс = (Σ позитив − Σ негатив) / Σ действий</div>
+        <p style="margin-top:8px">Индекс взвешен по объёму: у каждого действия равный вес, независимо от группы. Поэтому блок с ошибками не «топит» серию из 100 приёмов, как это было в исходной книге, где группы складывались с равными весами. В таблицах рейтинга эта цифра не используется, потому что у связующего она завышена.</p>
+        <p>Это суммарная характеристика всех групп, но формула открыта и полностью воспроизводима.</p>
+      </div>
+    </div>
+
+    <div class="grid m2">
+      <div class="card" id="m-reliab">
+        <h3 style="margin-top:0">Надёжность выборки</h3>
+        <p>Процент при малом числе действий статистически бессмыслен — страница помечает сомнительные выборки.</p>
+        <div class="scroll-x"><table class="mt">
+          <thead><tr><th class="l">Условие</th><th class="l">Где применяется</th><th class="l">Пометка</th></tr></thead>
+          <tbody>
+            <tr><td class="l">≥ ${MIN_SKILL} действий</td><td class="l">отдельный навык</td><td class="l">показатель скрыт «—»</td></tr>
+            <tr><td class="l">≥ ${MIN_VOL} действий и ≥ ${MIN_GAMES} матча</td><td class="l">общий рейтинг игроков</td><td class="l"><span class="mini-tag">мало данных</span></td></tr>
+            <tr><td class="l">&lt; ${MIN_MATCH} действий</td><td class="l">строки матчевой таблицы</td><td class="l">строка приглушена</td></tr>
+          </tbody>
+        </table></div>
+        <p class="mini" style="margin-top:8px">Пример: при 8 действиях разница «0%» и «50%» — это разница в 4 события. По таким выборкам выводы делать нельзя.</p>
+      </div>
+
+      <div class="card" id="m-diff">
+        <h3 style="margin-top:0">Отличия от исходной книги</h3>
+        <p>В книге «Итог» матча считался как среднее взвешенных баллов по пяти группам без учёта их объёма (веса из листа «Consts»). Это занижало всех, кроме специалистов одной группы, и добавляло шум от дробных полублоков. На странице:</p>
+        <ul>
+          <li>персональные E% каждой группы — без весов;</li>
+          <li>сводная эффективность (справочно) — взвешена по объёму действий;</li>
+          <li>добавлены киллинг%, идеальный приём%, очки − ошибки (за партию и на 100 действий), эйсы, блок-очки, баланс очков.</li>
+        </ul>
+        <p>Факты берутся из листов матчей как есть; в общее число передач входит и «Связка −» (в книге формула её исключает, из-за чего эффективность связующего завышалась). Поэтому числа страницы и «Общая эффективность» в Excel не совпадают — это сделано намеренно.</p>
+      </div>
+    </div>
+
+    <div class="card" id="m-new" style="margin-bottom:14px">
+      <h3 style="margin-top:0">Баланс, точки роста и ±/партия</h3>
+      <ul>
+        <li><b>Баланс очков</b> = чистые очки (атака++, блок+, эйсы) + ошибки соперника − наши ошибки − чистые очки соперника. Счёт соперника берётся из листов «Динамика».</li>
+        <li><b>±/партия</b> = (очки − ошибки) / число партий игрока; <b>Ош/100</b> = прямые ошибки на 100 действий. Так загрузка игрока не искажает сравнение.</li>
+        <li><b>Точки роста</b> = действия × (доля ошибок игрока − доля ошибок команды). «Устойчиво» — отличие проходит проверку Уилсона (95%), иначе возможен шум.</li>
+        <li><b>Сводная эфф.</b> у связующего завышена множеством безошибочных передач; не используйте её как единственный критерий.</li>
+        <li><b>Ход партии</b>: фазы по числу очков лидера (старт — до 40% очков партии, середина, концовка — от 80%); серии — 3+ очка соперника подряд. Источник — лист «Динамика»: он сходится с таблицей статистики (наши ошибки, чистые очки, ошибки соперника), кроме расхождений на 1 очко в нескольких партиях.</li>
+      </ul>
+    </div>
+    <div class="note" id="m-note">
+      <h3>Сноска аналитика: можно ли этим данным верить</h3>
+      <p><b>Технически данные сверяются автоматически.</b> Страница сама проверяет в каждой партии: очки = чистые очки + ошибки соперника, а ошибки игроков = ошибки команды; результат — внизу блока «Баланс очков» на вкладке «Обзор».</p>
+      <p><b>Но это ручная разметка одного наблюдателя без видеоповторов.</b> Качество приёма, защиты или «связка −» — субъективная оценка: один и тот же эпизод два статистика могут закодировать по-разному. Спорные моменты (полукасание блока, спасение через «/», мяч на линии) легко уходят на соседнюю категорию.</p>
+      <p><b>Насколько близко к реальности.</b> Счётная часть (очки, ошибки, объёмы) — высокая достоверность, погрешность порядка ±1–2 события на матч. Оценочная часть может «гулять» на несколько процентных пунктов: при выборке ≥100 действий одно перекодированное событие меняет эффективность не более чем на ~1 п.п., при 30 действиях — на ~3 п.п. Поэтому зазор в 2–3% эффективности между игроками — это ещё не факт, а сигнал.</p>
+      <p><b>Как правильно читать страницу:</b></p>
+      <ul>
+        <li>Смотрите на <b>объём</b> вместе с процентом: высокий E% на 2–4 действиях ничего не значит.</li>
+        <li>Сравнивайте только сопоставимые роли. У связующего в схеме 5–1 почти нет атак, и сравнивать его киллинг% с доигровщиком бессмысленно.</li>
+        <li><b>Полезность</b> (очки − ошибки) — самый наглядный показатель баланса, но он не видит невидимую работу: доводку, страхование, блок-аут.</li>
+        <li>Разницу в эффективности ≈3 п.п. и меньше при объёме 30–200 действий считайте шумом, а не фактом.</li>
+        <li>Для решений (награды, ротация) смотрите несколько матчей: объём + полезность + стабильность, а не один яркий сет.</li>
+      </ul>
+      <p style="margin-top:10px"><b>Итоговая оценка.</b> Страница точно отражает тот образ игры, который зафиксировала разметка, и честно показывает относительные роли игроков. Абсолютные проценты нужно интерпретировать с поправкой на субъективность разметки и объём выборки — сами по себе они показывают тенденции, а не точные уровни мастерства.</p>
+    </div>
+  </div>`;
+
+  const root = document.getElementById('v-method');
+  const toc = root ? root.querySelector('#m-toc') : null;
+  if(toc) toc.querySelectorAll('[data-jump]').forEach(b => b.addEventListener('click', () => {
+    const el = root.querySelector('#' + b.getAttribute('data-jump'));
+    if(!el || !el.scrollIntoView) return;
+    try{ el.scrollIntoView({behavior:'smooth', block:'start'}); }catch(e){}
+  }));
+}
+
+/* ================== запуск ================== */
+setTheme(document.documentElement.dataset.theme === 'light' ? 'light' : 'dark', false);
+$('#tabs').addEventListener('keydown', e => {
+  const tabs = [...$('#tabs').querySelectorAll('.tab')];
+  const i = tabs.indexOf(document.activeElement);
+  if(i<0) return;
+  let j=-1;
+  if(e.key==='ArrowRight'||e.key==='ArrowDown') j=(i+1)%tabs.length;
+  else if(e.key==='ArrowLeft'||e.key==='ArrowUp') j=(i-1+tabs.length)%tabs.length;
+  else if(e.key==='Home') j=0;
+  else if(e.key==='End') j=tabs.length-1;
+  if(j<0) return;
+  e.preventDefault();
+  tabs[j].focus();
+  tabs[j].click();
+});
+$('#tag-games').textContent = gamesCount;
+$('#tag-players').textContent = playersCount;
+function renderMethod(){
+  renderMethodFull();
+  const m=$('#v-method'), d=document.createElement('details'); d.className='fold'; d.innerHTML='<summary>Формулы, определения и ограничения</summary>';
+  [...m.childNodes].forEach(k=>d.appendChild(k)); m.appendChild(d);
+  m.insertAdjacentHTML('afterbegin',`<div class="section-title"><h2>Как читать цифры</h2><div class="line"></div></div><div class="card"><ul>
+    <li><b>Очки − ошибки</b>: наши чистые очки (атака++, блок+, эйсы) минус прямые ошибки. «±/партия» делает игроков с разной загрузкой сопоставимыми.</li>
+    <li><b>Баланс очков</b> = наши очки − очки соперников. Он складывается из чистых очков, ошибок соперника и наших ошибок.</li>
+    <li><b>«Возможно шум»</b>: данных мало (4 матча), по одной цифре выводы не делайте — смотрите на устойчивые повторы.</li>
+    <li>Это любительская статистика: она не влияет на игровое время и нужна, чтобы видеть, что подтянуть команде.</li>
+    <li>Источник — xlsx; страница сама сверяет очки и ошибки по партиям (блок «Баланс очков» на «Обзоре»).</li></ul></div>`);
+}
+function init(){
+  const gd=$('#gen-date'); if(gd) gd.textContent = playedGames.length ? playedGames[playedGames.length-1].dt : '–';
+  renderTabs();
+  applyHash();
+  [['overview',renderOverview],['ranking',renderRanking],['matches',renderMatches],['players',renderPlayers],['method',renderMethod]].forEach(function(pair){
+    var v=pair[0], r=pair[1];
+    try{ var sec=document.getElementById('v-'+v); if(sec && !sec.innerHTML) r(); }
+    catch(e){ console.warn('render '+v, e); }
+  });
+}
+if(document.getElementById('v-overview')) init(); else document.addEventListener('DOMContentLoaded', init);
+
+}
+
+try{ main(); }catch(err){ console.error(err); showFatal(err); }
+
+function showFatal(err){
+  try{
+    document.body.innerHTML = '<div class="wrap"><div class="card" style="border-color:var(--bad)"><h2 style="font-size:18px;margin-bottom:8px">Не удалось загрузить статистику</h2><p style="color:var(--muted);margin-bottom:8px">Произошла ошибка при инициализации страницы. Попробуйте переоткрыть файл.</p><pre style="overflow:auto;font-size:11px;color:var(--bad)">'+String(err&&err.stack||err).replace(/[<>&]/g,function(m){return m==='<'?'&lt;':m==='>'?'&gt;':'&amp;';})+'</pre></div></div>';
+  }catch(_){ document.body.textContent = 'Ошибка загрузки: '+String(err); }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+# Положите этот файл в репозиторий по пути: .github/workflows/pages.yml
+# Что делает: каждые 30 минут (и при каждом изменении репозитория или по кнопке «Run workflow»)
+# скачивает Google Таблицу, пересобирает страницу скриптом update_stats.py и публикует её на GitHub Pages.
+# Если скачивание или разбор не удался, публикация не происходит и на сайте остаётся прошлая версия.
+name: Update stats page
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  SHEET_ID: 1jDMMgIEyNdzEzxVui83D8zQlcykHDoVoCXjVt5Q36NU
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install openpyxl
+
+      - name: Rebuild page from the Google Sheet
+        run: |
+          mkdir -p site
+          python update_stats.py "https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=xlsx" index.html -o site/index.html | tee site/report.txt
+          # отчёт сверки виден в логе запуска; на сайт его не публикуем
+          mv site/report.txt "$RUNNER_TEMP/report.txt"
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
