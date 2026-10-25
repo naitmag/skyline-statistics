@@ -240,6 +240,41 @@ details.fold>summary::-webkit-details-marker{display:none}
 details.fold>summary::before{content:'▸';color:var(--dim);transition:transform .15s}
 details.fold[open]>summary::before{transform:rotate(90deg)}
 details.fold>.fold-body{padding:0 14px 14px}
+@media(max-width:640px){
+  table th,table td{padding:9px 5px;font-size:12.5px}
+  table.basic .c-sets,table.basic .c-e100{display:none}
+  table th{white-space:normal;line-height:1.2;letter-spacing:.02em;font-size:11px;vertical-align:bottom}
+  table td.l{white-space:normal}
+  table td.l .name{display:inline-block;max-width:125px;line-height:1.25}
+  table td.l .name .mini-tag{display:block;width:max-content;margin:3px 0 0}
+  .rankbadge{flex:none;transform:scale(.9)}
+  .sk-col{display:none}
+  .mini-tag,.setbox .sn,.setbox .se,.kv-k,.big small,.arr{font-size:11.5px}
+  .method .kv-i{grid-template-columns:1fr!important;gap:2px}
+  .hero{gap:10px}
+  .section-title{flex-wrap:wrap;row-gap:6px}
+  .section-title .hint{flex-basis:100%;order:9}
+  .setbox{flex:1 1 calc(50% - 8px)}
+}
+@media(pointer:coarse){
+  .tab,.chip,.export-btn,.theme-btn{min-height:40px}
+  th[data-k]{padding-top:12px;padding-bottom:12px}
+  details.fold>summary{min-height:48px}
+}
+@media(max-width:640px){
+  .ph th,.ph td{padding:8px 4px}
+  .ph td .mini{display:block}
+  header.hero h1,.hero h1{font-size:23px;line-height:1.15}
+  nav.tabs .tab{padding:8px 11px;font-size:14px}
+  .note{padding:12px 14px;font-size:13.5px}
+}
+@media(max-width:640px){
+  table[data-fname="results"] th,table[data-fname="results"] td{padding:8px 3px;font-size:12px}
+  table[data-fname="results"] td.l{min-width:0}
+  table[data-fname="results"] th{font-size:10.5px}
+  .ph th,.ph td{font-size:12px}
+}
+@media(max-width:380px){table td.l .name{max-width:104px}table th,table td{padding:9px 3px}.ph th,.ph td{padding:8px 3px}}
 </style>
 </head>
 <body>
@@ -505,7 +540,7 @@ function benchLine(key,p){
   const b=BENCH[key];
   if(!b || (b.n(p)||0) < MIN_SKILL) return '';
   const tag=benchTag(b.get(p),b);
-  return tag ? `<div class="skill-note" style="margin-top:5px;color:var(--muted)">к команде: ${tag}</div>` : '';
+  return tag ? `<div class="skill-note" style="margin-top:5px;color:var(--muted)">${b.name} — к команде: ${tag}</div>` : '';
 }
 function benchList(pl){
   const rows=BENCH_ORDER.map(k=>{
@@ -548,8 +583,8 @@ function balanceCard(){
   const all={W:sum('W'),O:sum('O'),E:sum('E'),OW:withQ.length?withQ.reduce((a,r)=>a+r.OW,0):null,D:withQ.length?withQ.reduce((a,r)=>a+r.D,0):null};
   const chk=dataChecks();
   return `<div class="section-title" style="margin-top:26px"><h2>Баланс очков</h2>${exp('results','CSV')}<div class="line"></div><div class="hint">разница = чистые очки + ошибки соперника − наши ошибки − чистые очки соперника</div></div>
-  <div class="card pad0"><div class="scroll-x"><table data-fname="results" aria-label="Баланс очков"><thead><tr><th class="l">Матч</th><th title="Атака++, блок+, эйсы">Наши чистые</th><th title="Ошибки соперника">+ Ош. соперника</th><th>− Наши ошибки</th><th title="Очки соперника без наших ошибок">− Чистые соперника</th><th>Разница</th></tr></thead>
-  <tbody>${rows.map(r=>line(`<b>${esc(r.dt)}</b> <span class="mini">vs ${esc(r.opp)}${r.S?' · сеты '+r.S:''}</span>`,r)).join('')}${line('Сезон',all,true)}</tbody></table></div>
+  <div class="card pad0"><div class="scroll-x"><table data-fname="results" aria-label="Баланс очков"><thead><tr><th class="l" title="Дата, счёт по партиям, соперник">Матч · сеты</th><th title="Атака++, блок+, эйсы">Наши чист.</th><th title="Ошибки соперника">+Ош. соп.</th><th>−Наши ош.</th><th title="Очки соперника без наших ошибок">−Чист. соп.</th><th>Разница</th></tr></thead>
+  <tbody>${rows.map(r=>line(`<b>${esc(r.dt)}</b> <span class="mini">${r.S?'· '+r.S:''}</span><div class="mini">${esc(r.opp)}</div>`,r)).join('')}${line('Сезон',all,true)}</tbody></table></div>
   <div class="mini" style="padding:12px 18px">${share==null?'':`Наши ошибки составляют ${share}% всех очков соперника — это главный рычаг. `}Сверка данных: ${chk.length?'<span style="color:var(--warn)">'+chk.map(esc).join('; ')+'</span>':'<span style="color:var(--good)">очки, ошибки и чистые очки сходятся во всех партиях</span>'}.</div></div>`;
 }
 const fold=(t,b,open)=>`<details class="fold"${open?' open':''}><summary>${t}</summary><div class="fold-body">${b}</div></details>`;
@@ -592,9 +627,9 @@ function phaseAgg(list){
 function phaseTable(A){
   const worst = A.reduce((m,x,i)=> x.n && x.F/x.n > (A[m].n?A[m].F/A[m].n:-1) ? i : m, 0);
   const rows=A.map((x,i)=>`<tr${i===worst&&x.n?' style="background:rgba(248,113,113,.08)"':''}><td class="l"><b>${PH_NAMES[i]}</b></td><td>${x.n}</td><td>${x.n?Math.round(x.w/x.n*100):0}%</td>
-    <td style="color:var(--bad);font-weight:700">${x.F} <span class="mini">(${x.n?Math.round(x.F/x.n*100):0}%)</span></td><td>${x.E} <span class="mini">(${x.n?Math.round(x.E/x.n*100):0}%)</span></td><td>${x.W}</td><td>${x.O}</td>
-    ${ESK.map(k=>`<td style="color:var(--dim)">${x.sk[k]||'·'}</td>`).join('')}</tr>`).join('');
-  return `<div class="scroll-x"><table class="ph" aria-label="Ошибки по ходу партии"><thead><tr><th class="l">Фаза</th><th title="Розыгрышей">Розыгр.</th><th title="Доля розыгрышей, выигранных нами">Мы выигр.</th><th title="Наши ошибки (доля от розыгрышей)">Наши ош.</th><th title="Ошибки соперника">Ош. соп.</th><th title="Наши чистые очки">Наши чист.</th><th title="Чистые очки соперника">Чист. соп.</th>${ESK.map(k=>`<th title="Наши ошибки: ${k}">${k}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
+    <td style="color:var(--bad);font-weight:700">${x.F} <span class="mini">(${x.n?Math.round(x.F/x.n*100):0}%)</span></td><td>${x.E} <span class="mini">(${x.n?Math.round(x.E/x.n*100):0}%)</span></td><td class="sk-col">${x.W}</td><td class="sk-col">${x.O}</td>
+    ${ESK.map(k=>`<td class="sk-col" style="color:var(--dim)">${x.sk[k]||'·'}</td>`).join('')}</tr>`).join('');
+  return `<div class="scroll-x"><table class="ph" aria-label="Ошибки по ходу партии"><thead><tr><th class="l">Фаза</th><th title="Розыгрышей">Розыгр.</th><th title="Доля розыгрышей, выигранных нами">Выигр.</th><th title="Наши ошибки (доля от розыгрышей)">Наши ош.</th><th title="Ошибки соперника">Ош. соп.</th><th class="sk-col" title="Наши чистые очки">Наши чист.</th><th class="sk-col" title="Чистые очки соперника">Чист. соп.</th>${ESK.map(k=>`<th class="sk-col" title="Наши ошибки: ${k}">${k}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 function findRuns(g,si,min){
   const list=setRallies(g,si), runs=[]; let cur=null;
@@ -837,9 +872,9 @@ function playerTable(rows, st, o){
     return typeof va==='string' ? st.d*va.localeCompare(vb) : st.d*(va-vb); });
   if(o.badge) sorted.sort((a,b)=>(o.low(a)?1:0)-(o.low(b)?1:0));
   const head = cols.map(c => { const on = st.k===c.k;
-    return `<th class="${c.k==='name'?'l ':''}${on?'sorted':''}" data-k="${c.k}" tabindex="0" role="columnheader" scope="col" aria-sort="${on?(st.d<0?'descending':'ascending'):'none'}" aria-label="${c.t}: ${RTIP[c.k]}" title="${RTIP[c.k]}">${c.t}${on?`<span class="arr">${st.d<0?'▼':'▲'}</span>`:''}</th>`; }).join('');
-  const body = sorted.map((p,i)=>`<tr class="${o.low(p)&&!o.badge?'small-sample':''}">${cols.map(c=>ptCell(c.k,p,i+1,o)).join('')}</tr>`).join('');
-  return `<table data-fname="${o.fname}" aria-label="${o.aria}"><thead><tr>${head}</tr></thead><tbody>${body||`<tr><td colspan="${cols.length}" class="l" style="color:var(--dim);padding:18px">Нет игроков по фильтру</td></tr>`}</tbody></table>`;
+    return `<th class="${c.k==='name'?'l ':''}${on?'sorted':''}${c.k==='sets'||c.k==='e100'?' c-'+c.k:''}" data-k="${c.k}" tabindex="0" role="columnheader" scope="col" aria-sort="${on?(st.d<0?'descending':'ascending'):'none'}" aria-label="${c.t}: ${RTIP[c.k]}" title="${RTIP[c.k]}">${c.t}${on?`<span class="arr">${st.d<0?'▼':'▲'}</span>`:''}</th>`; }).join('');
+  const body = sorted.map((p,i)=>`<tr class="${o.low(p)&&!o.badge?'small-sample':''}">${cols.map(c=>{const h=ptCell(c.k,p,i+1,o);return (c.k==='sets'||c.k==='e100')?h.replace('<td','<td class="c-'+c.k+'"'):h;}).join('')}</tr>`).join('');
+  return `<table class="${state.more?'':'basic'}" data-fname="${o.fname}" aria-label="${o.aria}"><thead><tr>${head}</tr></thead><tbody>${body||`<tr><td colspan="${cols.length}" class="l" style="color:var(--dim);padding:18px">Нет игроков по фильтру</td></tr>`}</tbody></table>`;
 }
 function bindPlayerSort(rootSel, st, rerender){
   const bm=$(rootSel).querySelector('#btn-more'); if(bm) bm.addEventListener('click',()=>{ state.more=!state.more; rerender(); });
@@ -919,7 +954,7 @@ function renderMatches(){
           <h3>${esc(g.dt)} · <span style="color:var(--acc)">vs ${esc(g.opp)}</span> ${q.length?`<span class="mini">· сеты ${setsW}:${setsL}</span>`:''}</h3>
           <div class="score" style="margin-top:6px">Очки: <b style="color:var(--good)">${fmtNum(g.tm.pt[5])}</b> · ошибки соперника ${fmtNum(g.tm.op[5])} · наши ошибки ${fmtNum(g.tm.er[5])} (${fmtNum(g.tm.uf.reduce((a,b)=>a+(b||0),0))} невынужденных)</div>
         </div>
-        <div style="margin-left:auto"><div class="score" style="margin-top:6px">Команда: полезность <b style="color:${tm.util>=0?'var(--good)':'var(--bad)'}">${fmtNum(tm.util)}</b></div></div>
+        <div style="margin-left:auto"><div class="score" style="margin-top:6px">Баланс команды (очки − ошибки): <b style="color:${tm.util>=0?'var(--good)':'var(--bad)'}">${fmtNum(tm.util)}</b></div></div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">${sets}</div>
       
@@ -1037,14 +1072,13 @@ function renderPlayers(){
         ${statInRow(p.sets,'Партий')}
         ${statInRow(fmtNum(p.pts),'Очки')}
         ${statInRow(fmtNum(p.err),'Ошибки')}
-        ${statInRow(p.netSet==null?'—':fmtNum(p.netSet),'±/партия')}
         ${statInRow(p.e100==null?'—':fmtNum(p.e100),'Ош/100 действ.')}
       </div>
     </div>
     ${playerGrowth(p)}
     <div class="grid g2" style="margin-top:16px;align-items:start">
       <div class="card"><h3 style="font-size:15px;margin-bottom:10px">Источники ошибок</h3>${errorSources(p.sk)}</div>
-      <div>${['attack','recv','serve','block'].filter(k=>SK_ORDER.includes(k)).map(k=>skillDetailCard(k,p)).join('')}</div>
+      <div style="display:grid;gap:12px">${['attack','recv','serve','block'].filter(k=>SK_ORDER.includes(k)).map(k=>skillDetailCard(k,p)).join('')}</div>
     </div>
     ${fold('Другие навыки', `<div class="grid cards">${SK_ORDER.filter(k=>!['attack','recv','serve','block'].includes(k)).map(k=>skillDetailCard(k,p)).join('')}</div>`)}
     ${fold('Сравнение со средним по команде', benchList(p))}
